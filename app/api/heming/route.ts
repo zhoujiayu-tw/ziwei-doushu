@@ -1,4 +1,5 @@
 import { describeChart, HEMING_SYSTEM } from '@/lib/ai/chart-prompt';
+import { checkAiRateLimit } from '@/lib/ai/rate-limit';
 import { BadRequest, chartFromBody, jsonError, streamClaude } from '@/lib/ai/claude-stream';
 
 export const dynamic = 'force-dynamic';
@@ -7,6 +8,8 @@ const DEFAULT_QUESTION = '请依合盘方法，完整分析这两张命盘的契
 
 export async function POST(req: Request) {
   if (!process.env.ANTHROPIC_API_KEY) return jsonError(503, '尚未设定 ANTHROPIC_API_KEY');
+  const limited = await checkAiRateLimit(req);
+  if (limited) return limited;
   let body: { chartA?: unknown; chartB?: unknown; question?: unknown };
   try {
     body = await req.json();

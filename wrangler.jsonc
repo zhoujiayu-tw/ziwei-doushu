@@ -16,10 +16,13 @@
 			"service": "zhoujiayu-ziwei"
 		}
 	],
-	"vars": {
-		"NEXT_PUBLIC_SITE_URL": "https://zhoujiayu.app"
-	}
-	// 綁定自訂網域：確認要取代的子網域後取消註解，例如
-	// "routes": [{ "pattern": "zhoujiayu.app", "custom_domain": true }]
+	// 自訂網域：zhoujiayu.app 必須在同一個 Cloudflare 帳號，部署時會自動建立 DNS 紀錄與憑證
+	"routes": [{ "pattern": "bz.zhoujiayu.app", "custom_domain": true }],
+	// AI 介面的流量限制（見 lib/ai/rate-limit.ts）；period 只能是 10 或 60 秒
+	"ratelimits": [
+		{ "name": "AI_RATE_LIMITER", "namespace_id": "4101", "simple": { "limit": 6, "period": 60 } },
+		{ "name": "AI_GLOBAL_LIMITER", "namespace_id": "4102", "simple": { "limit": 60, "period": 60 } }
+	],
+	"observability": { "enabled": true }
 	// ANTHROPIC_API_KEY 用 `npx wrangler secret put ANTHROPIC_API_KEY` 設定，不要寫在這裡
 }
