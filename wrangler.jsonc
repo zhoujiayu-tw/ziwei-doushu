@@ -1,0 +1,25 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"main": ".open-next/worker.js",
+	"name": "zhoujiayu-ziwei",
+	"compatibility_date": "2026-10-01",
+	"compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+	"assets": {
+		"directory": ".open-next/assets",
+		"binding": "ASSETS"
+	},
+	"services": [
+		{
+			// 自我引用的 service binding，service 名稱必須和上面的 name 一致
+			// 見 https://opennext.js.org/cloudflare/caching
+			"binding": "WORKER_SELF_REFERENCE",
+			"service": "zhoujiayu-ziwei"
+		}
+	],
+	"vars": {
+		"NEXT_PUBLIC_SITE_URL": "https://zhoujiayu.app"
+	}
+	// 綁定自訂網域：確認要取代的子網域後取消註解，例如
+	// "routes": [{ "pattern": "zhoujiayu.app", "custom_domain": true }]
+	// ANTHROPIC_API_KEY 用 `npx wrangler secret put ANTHROPIC_API_KEY` 設定，不要寫在這裡
+}
