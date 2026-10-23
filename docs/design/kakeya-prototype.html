@@ -7,421 +7,697 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@300;400;700&family=Noto+Sans+TC:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@300;400;700&family=Noto+Sans+TC:wght@300;400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-/* 版面：漆黑夜空上的金線。一根「掛谷針」貫穿全頁：首屏轉遍十二方向，命盤裡指向三方四正，最後一節把方向擠進最小面積 */
+/* 版面：一個貫穿全頁的 WebGL 光場，1440 根光針隨捲動重組成五種數學結構；內容是浮在光場上的磨砂玻璃層。只做深色。 */
 :root {
-  --ink: #0e1119;          /* 底：靛黑漆面 */
-  --ink-2: #151a26;        /* 次層面板 */
-  --line: #262d3d;         /* 分隔線 */
-  --fg: #e9e4d8;           /* 正文：米白 */
-  --muted: #9a9fae;        /* 次要文字 */
-  --needle: #d9b66b;       /* 針：金箔 */
-  --needle-soft: rgba(217, 182, 107, .16);
-  --lu: #7db89b;           /* 化祿 玉綠 */
-  --quan: #d9b66b;         /* 化權 金 */
-  --ke: #8fa9d9;           /* 化科 青 */
-  --ji: #d46f55;           /* 化忌 朱 */
-  --cell: rgba(21, 26, 38, .78);
+  --void: #05060a;            /* 最深的底 */
+  --ink: #0a0c13;             /* 面板底 */
+  --glass: rgba(14, 17, 27, .58);
+  --glass-hi: rgba(255, 255, 255, .06);
+  --edge: rgba(255, 255, 255, .08);
+  --fg: #ece6d8;              /* 米白正文 */
+  --muted: #8d93a5;
+  --faint: #5b6174;
+  --gold: #e6c47c;            /* 針與重點：金箔 */
+  --gold-deep: #b48a3c;
+  --gold-glow: rgba(230, 196, 124, .35);
+  --water: #6ea8e0; --fire: #e57a5c; --wood: #7fc795; --metal: #d9dde8;   /* 三合四局 */
+  --lu: #7fc79b; --quan: #e6c47c; --ke: #8eaee6; --ji: #e3735a;          /* 四化 */
   --font-display: "LXGW WenKai TC", "Kaiti TC", "BiauKai", serif;
   --font-body: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
-  --step--1: .8125rem; --step-0: 1rem; --step-1: 1.25rem; --step-2: 1.75rem; --step-3: clamp(2.25rem, 6vw, 3.75rem);
+  --step--1: .8125rem; --step-0: 1rem; --step-1: 1.25rem; --step-2: clamp(1.6rem, 3.2vw, 2.1rem); --step-3: clamp(2.4rem, 6.4vw, 4.4rem);
   color-scheme: dark;
 }
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme="dark"]) {
-    --ink: #eef0f3; --ink-2: #e3e7ed; --line: #c9cfda; --fg: #1a2131; --muted: #5d6578;
-    --needle: #9a6a1c; --needle-soft: rgba(154, 106, 28, .14);
-    --lu: #2f7d5a; --quan: #9a6a1c; --ke: #3a5ea8; --ji: #b2452c;
-    --cell: rgba(238, 240, 243, .82); color-scheme: light;
-  }
-}
-:root[data-theme="light"] {
-  --ink: #eef0f3; --ink-2: #e3e7ed; --line: #c9cfda; --fg: #1a2131; --muted: #5d6578;
-  --needle: #9a6a1c; --needle-soft: rgba(154, 106, 28, .14);
-  --lu: #2f7d5a; --quan: #9a6a1c; --ke: #3a5ea8; --ji: #b2452c;
-  --cell: rgba(238, 240, 243, .82); color-scheme: light;
-}
-
 * { box-sizing: border-box; }
+html { background: var(--void); }
 body {
-  background: var(--ink); color: var(--fg);
-  font-family: var(--font-body); font-size: var(--step-0); line-height: 1.7;
-  padding-left: max(16px, env(safe-area-inset-left, 0px));
-  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  background: var(--void); color: var(--fg);
+  font-family: var(--font-body); font-weight: 400; font-size: var(--step-0); line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
 }
-.wrap { max-width: 1120px; margin: 0 auto; }
-h1, h2, h3 { font-family: var(--font-display); font-weight: 400; text-wrap: balance; margin: 0; letter-spacing: .02em; }
+h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 400; text-wrap: balance; margin: 0; letter-spacing: .02em; }
 p { margin: 0; }
 .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
-.eyebrow { font-family: var(--font-mono); font-size: .75rem; letter-spacing: .14em; text-transform: uppercase; color: var(--needle); }
+.eyebrow { font-family: var(--font-mono); font-size: .72rem; letter-spacing: .18em; text-transform: uppercase; color: var(--gold); display: inline-flex; align-items: center; gap: 10px; }
+.eyebrow::before { content: ""; width: 28px; height: 1px; background: linear-gradient(90deg, transparent, var(--gold)); }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
 
-/* 頂欄 */
-header.top { display: flex; align-items: center; justify-content: space-between; gap: 8px 16px; flex-wrap: wrap; padding-block: 20px; border-bottom: 1px solid var(--line); }
-.brand { display: flex; align-items: baseline; gap: 10px; }
-.brand b { font-family: var(--font-display); font-size: var(--step-1); font-weight: 700; white-space: nowrap; }
-.brand span { font-family: var(--font-mono); font-size: .72rem; color: var(--muted); }
-nav.main { display: flex; gap: 4px; flex-wrap: wrap; }
-nav.main a { color: var(--muted); text-decoration: none; font-size: var(--step--1); padding: 4px 10px; border-radius: 999px; }
-nav.main a[aria-current] { color: var(--fg); background: var(--needle-soft); }
-nav.main a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--needle); outline-offset: 2px; }
+/* ── 光場與覆蓋層（固定在最底） ── */
+#field, #labels { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+#field { z-index: 0; }
+#labels { z-index: 1; pointer-events: none; }
+.atmos { position: fixed; inset: 0; z-index: 2; pointer-events: none;
+  background:
+    radial-gradient(120% 80% at 50% 0%, transparent 55%, rgba(0,0,0,.55) 100%),
+    radial-gradient(90% 70% at 50% 110%, rgba(0,0,0,.65), transparent 60%); }
+.grain { position: fixed; inset: -50%; z-index: 3; pointer-events: none; opacity: .07; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  animation: grain 1.2s steps(6) infinite; }
+@keyframes grain { 0%{transform:translate(0,0)} 20%{transform:translate(-3%,2%)} 40%{transform:translate(2%,-3%)} 60%{transform:translate(-2%,-1%)} 80%{transform:translate(3%,3%)} 100%{transform:translate(0,0)} }
+.no-webgl #field { background: radial-gradient(60% 50% at 50% 40%, rgba(230,196,124,.12), transparent 70%), var(--void); }
+
+/* ── 內容層 ── */
+.page { position: relative; z-index: 4;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.wrap { max-width: 1160px; margin: 0 auto; }
+
+header.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10; padding-block: 14px; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 11; background: var(--void); }
+.bar { display: flex; align-items: center; justify-content: space-between; gap: 8px 16px; flex-wrap: wrap;
+  padding: 10px 14px 10px 18px; border-radius: 14px; background: rgba(8, 10, 16, .55); backdrop-filter: blur(16px) saturate(130%);
+  border: 1px solid var(--edge); box-shadow: 0 10px 40px rgba(0,0,0,.35), inset 0 1px 0 var(--glass-hi); }
+.brand { display: flex; align-items: center; gap: 10px; white-space: nowrap; }
+.brand svg { width: 22px; height: 22px; }
+.brand b { font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; letter-spacing: .08em; }
+.brand span { font-family: var(--font-mono); font-size: .7rem; color: var(--faint); }
+nav.main { display: flex; gap: 2px; flex-wrap: wrap; }
+nav.main a { color: var(--muted); text-decoration: none; font-size: var(--step--1); padding: 5px 12px; border-radius: 999px; transition: color .2s, background .2s; }
+nav.main a:hover { color: var(--fg); }
+nav.main a.on { color: var(--void); background: var(--gold); box-shadow: 0 0 18px var(--gold-glow); }
+
+section.scene { padding-block: clamp(72px, 16vh, 160px); display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; }
+.scene-copy { max-width: 560px; display: flex; flex-direction: column; gap: 18px; }
+.scene-copy.right { margin-left: auto; }
+.scene-copy p { color: #c9c3b6; }
+.scene-copy p.small { color: var(--muted); font-size: var(--step--1); }
+
+/* 磨砂玻璃：細邊漸層 + 上緣高光 + 跟著游標的光斑 */
+.glass { position: relative; background: var(--glass); backdrop-filter: blur(18px) saturate(125%);
+  border-radius: 18px; padding: clamp(18px, 3vw, 28px); isolation: isolate;
+  box-shadow: 0 30px 80px rgba(0,0,0,.45), inset 0 1px 0 var(--glass-hi); }
+.glass::before { content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1px; pointer-events: none;
+  background: linear-gradient(140deg, rgba(230,196,124,.45), rgba(255,255,255,.06) 30%, rgba(255,255,255,.02) 60%, rgba(142,174,230,.25));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
+.glass::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: -1;
+  background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 0%), rgba(230,196,124,.10), transparent 60%); opacity: var(--hover, 0); transition: opacity .3s; }
+.glass:hover { --hover: 1; }
 
 /* 首屏 */
-.hero { display: grid; grid-template-columns: 1.05fr 1fr; gap: 40px; align-items: center; padding-block: 48px 32px; }
-.hero-copy { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
-.hero h1 { font-size: var(--step-3); line-height: 1.15; }
-.hero h1 em { font-style: normal; color: var(--needle); }
-.hero .lede { color: var(--muted); max-width: 34em; }
-.readout { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; font-size: var(--step--1); border-top: 1px solid var(--line); padding-top: 16px; max-width: 30em; }
-.readout dt { color: var(--muted); font-family: var(--font-mono); font-size: .75rem; letter-spacing: .08em; padding-top: 2px; }
-.readout dd { margin: 0; }
-.readout dd strong { font-family: var(--font-display); font-weight: 700; font-size: var(--step-1); color: var(--needle); }
-.stage { position: relative; aspect-ratio: 1; width: 100%; max-width: 520px; justify-self: center; }
-.stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.hero { min-height: min(92vh, 860px); display: grid; grid-template-columns: minmax(0, 1fr); align-content: center; gap: 28px; padding-block: 56px 72px; }
+.hero h1 { font-size: var(--step-3); line-height: 1.12; max-width: 12em; text-shadow: 0 0 40px rgba(0,0,0,.6); }
+.hero h1 em { font-style: normal; background: linear-gradient(100deg, #f6e2b0, var(--gold) 40%, var(--gold-deep)); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 0 22px rgba(230,196,124,.35)); }
+.hero .lede { max-width: 36em; color: #cfc8ba; }
+.theorems { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: var(--edge); border-radius: 14px; overflow: hidden; max-width: 920px; }
+.theorems div { background: rgba(8, 10, 16, .72); backdrop-filter: blur(10px); padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.theorems .y { font-family: var(--font-mono); color: var(--gold); font-size: .78rem; }
+.theorems b { font-family: var(--font-display); font-weight: 400; font-size: var(--step-1); }
+.theorems span { color: var(--muted); font-size: .75rem; line-height: 1.5; }
+.scroll-hint { font-family: var(--font-mono); font-size: .7rem; letter-spacing: .2em; color: var(--faint); display: flex; align-items: center; gap: 10px; }
+.scroll-hint i { width: 1px; height: 36px; background: linear-gradient(var(--gold), transparent); animation: drip 2.4s ease-in-out infinite; transform-origin: top; }
+@keyframes drip { 0%{transform:scaleY(0)} 50%{transform:scaleY(1)} 100%{transform:scaleY(1);opacity:0} }
 
-/* 區段 */
-section.block { padding-block: 40px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 24px; }
-.block-head { display: flex; justify-content: space-between; align-items: end; gap: 16px; flex-wrap: wrap; }
-.block-head h2 { font-size: var(--step-2); }
-.note { font-size: var(--step--1); color: var(--muted); }
-.sample-tag { font-family: var(--font-mono); font-size: .7rem; letter-spacing: .1em; color: var(--muted); border: 1px dashed var(--line); padding: 2px 8px; border-radius: 4px; white-space: nowrap; }
-
-/* 出生資料 */
-form.birth { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; align-items: end; }
-.field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-.field label { font-size: .75rem; color: var(--muted); }
-.field input, .field select { font: inherit; font-size: var(--step--1); color: var(--fg); background: var(--ink-2); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; width: 100%; }
-.btn { font: inherit; font-size: var(--step--1); border: 1px solid var(--needle); background: transparent; color: var(--needle); padding: 8px 16px; border-radius: 6px; cursor: pointer; }
-.btn:hover { background: var(--needle-soft); }
-.btn.solid { background: var(--needle); color: var(--ink); }
+/* 數學旁註 */
+.formula { font-family: var(--font-mono); font-size: .82rem; color: var(--gold); background: rgba(230,196,124,.06); border: 1px solid rgba(230,196,124,.18); border-radius: 8px; padding: 10px 14px; line-height: 1.7; overflow-x: auto; }
+.formula .c { color: var(--muted); }
+.pillars { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.pillar { border-radius: 10px; border: 1px solid var(--edge); background: rgba(8,10,16,.6); padding: 10px; text-align: center; display: flex; flex-direction: column; gap: 2px; }
+.pillar small { color: var(--muted); font-size: .7rem; }
+.pillar b { font-family: var(--font-display); font-weight: 400; font-size: 1.6rem; line-height: 1.2; color: var(--gold); text-shadow: 0 0 18px var(--gold-glow); }
+.pillar span { font-family: var(--font-mono); font-size: .68rem; color: var(--faint); }
+.legend { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.legend button { font: inherit; text-align: left; color: var(--fg); background: rgba(8,10,16,.6); border: 1px solid var(--edge); border-radius: 10px; padding: 8px 12px; cursor: pointer; display: flex; gap: 10px; align-items: center; transition: border-color .2s, box-shadow .2s; }
+.legend button i { width: 10px; height: 10px; border-radius: 50%; flex: none; box-shadow: 0 0 10px currentColor; }
+.legend button b { font-family: var(--font-display); font-weight: 400; }
+.legend button span { color: var(--muted); font-size: .75rem; margin-left: auto; font-family: var(--font-mono); }
+.legend button[aria-pressed="true"] { border-color: currentColor; box-shadow: 0 0 0 1px currentColor inset, 0 0 24px -6px currentColor; }
 
 /* 命盤 */
-.chart-layout { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 24px; align-items: start; }
-.board { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(4, minmax(0, 1fr)); gap: 4px; aspect-ratio: 1; width: 100%; max-width: 100%; }
-.board canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
-.cell { position: relative; z-index: 1; background: var(--cell); border: 1px solid var(--line); border-radius: 4px; padding: 6px 7px; display: flex; flex-direction: column; gap: 2px; min-width: 0; overflow: hidden; cursor: pointer; text-align: left; font: inherit; color: inherit; backdrop-filter: blur(2px); }
-.cell:hover { border-color: var(--needle); }
-.cell[aria-pressed="true"] { border-color: var(--needle); box-shadow: inset 0 0 0 1px var(--needle); }
-.cell.trine { border-color: color-mix(in srgb, var(--needle) 55%, var(--line)); }
-.cell .majors { font-family: var(--font-display); font-size: clamp(.8rem, 1.7vw, 1.05rem); line-height: 1.3; display: flex; flex-wrap: wrap; gap: 0 6px; }
-.cell .majors .br { font-family: var(--font-body); font-size: .62rem; color: var(--muted); margin-left: 1px; }
-.cell .borrow { color: var(--muted); font-size: .7rem; }
-.cell .minors { font-size: .64rem; color: var(--muted); line-height: 1.35; }
+.chart-head { display: flex; justify-content: space-between; align-items: end; gap: 16px; flex-wrap: wrap; }
+.chart-head h2, .scene h2 { font-size: var(--step-2); }
+.tag { font-family: var(--font-mono); font-size: .68rem; letter-spacing: .12em; color: var(--muted); border: 1px dashed rgba(255,255,255,.14); padding: 3px 10px; border-radius: 999px; white-space: nowrap; }
+form.birth { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)) auto; gap: 10px; align-items: end; }
+.field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.field label { font-size: .72rem; color: var(--muted); letter-spacing: .04em; }
+.field input, .field select { font: inherit; font-size: var(--step--1); color: var(--fg); background: rgba(5,6,10,.6); border: 1px solid var(--edge); border-radius: 10px; padding: 9px 12px; width: 100%; transition: border-color .2s, box-shadow .2s; }
+.field input:focus, .field select:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(230,196,124,.15); }
+.btn { font: inherit; font-size: var(--step--1); font-weight: 500; letter-spacing: .1em; border: 0; border-radius: 10px; padding: 10px 22px; cursor: pointer; color: #1a1408;
+  background: linear-gradient(180deg, #f3dca2, var(--gold) 45%, var(--gold-deep)); box-shadow: 0 8px 24px -8px var(--gold-glow), inset 0 1px 0 rgba(255,255,255,.5); }
+.btn:hover { filter: brightness(1.06); }
+.note { font-size: var(--step--1); color: var(--muted); }
+
+.chart-layout { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.board { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(4, minmax(0, 1fr)); gap: 5px; aspect-ratio: 1; width: 100%; padding: 5px; border-radius: 16px; background: rgba(5,6,10,.55); border: 1px solid var(--edge); box-shadow: 0 40px 100px rgba(0,0,0,.55), inset 0 0 60px rgba(230,196,124,.04); }
+.board canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2; mix-blend-mode: screen; }
+.cell { --lit: 0; position: relative; z-index: 1; border-radius: 9px; padding: 7px 8px; display: flex; flex-direction: column; gap: 2px; min-width: 0; overflow: hidden; cursor: pointer; text-align: left; font: inherit; color: inherit;
+  background:
+    radial-gradient(120% 90% at 50% 50%, rgba(230,196,124, calc(var(--lit) * .16)), transparent 70%),
+    linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.01)), rgba(12, 14, 22, .82);
+  border: 1px solid rgba(255,255,255, calc(.06 + var(--lit) * .2)); transition: transform .25s; }
+.cell:hover { transform: translateY(-1px); border-color: rgba(230,196,124,.5); }
+.cell[aria-pressed="true"] { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold) inset, 0 0 30px -6px var(--gold-glow); }
+.cell.trine { border-color: rgba(230,196,124,.38); }
+.cell .majors { font-family: var(--font-display); font-size: clamp(.78rem, 1.6vw, 1.08rem); line-height: 1.3; display: flex; flex-wrap: wrap; gap: 0 6px; }
+.cell .majors > span { white-space: nowrap; }
+.cell .majors .br { font-family: var(--font-body); font-size: .6rem; color: var(--muted); margin-left: 1px; }
+.cell .borrow { color: var(--muted); font-size: .68rem; }
+.cell .minors { font-size: .62rem; color: var(--faint); line-height: 1.4; }
 .cell .foot { margin-top: auto; display: flex; justify-content: space-between; align-items: end; gap: 4px; }
-.cell .pname { font-family: var(--font-display); font-size: .82rem; }
-.cell .pname.ming { color: var(--needle); }
-.cell .gz { font-family: var(--font-mono); font-size: .62rem; color: var(--muted); }
-.cell .age { font-family: var(--font-mono); font-size: .6rem; color: var(--muted); }
-.cell .dx-now { position: absolute; top: 5px; right: 6px; width: 6px; height: 6px; border-radius: 50%; background: var(--needle); }
-.hua { display: inline-block; font-family: var(--font-body); font-size: .6rem; line-height: 1; padding: 2px 3px; border-radius: 3px; color: var(--ink); vertical-align: 2px; margin-left: 2px; }
+.cell .pname { font-family: var(--font-display); font-size: .84rem; }
+.cell .pname.ming { color: var(--gold); text-shadow: 0 0 12px var(--gold-glow); }
+.cell .gz, .cell .age { font-family: var(--font-mono); font-size: .58rem; color: var(--faint); }
+.cell .dx-now { position: absolute; top: 6px; right: 7px; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 10px var(--gold); }
+.hua { display: inline-block; font-family: var(--font-body); font-size: .58rem; line-height: 1; padding: 2px 3px; border-radius: 3px; color: #0a0c13; vertical-align: 2px; margin-left: 2px; font-weight: 700; }
 .hua.祿 { background: var(--lu); } .hua.權 { background: var(--quan); } .hua.科 { background: var(--ke); } .hua.忌 { background: var(--ji); }
-.center { grid-column: 2 / 4; grid-row: 2 / 4; z-index: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px; text-align: center; pointer-events: none; padding: 8px; }
-.center > div { background: var(--cell); border-radius: 4px; padding: 0 6px; }
-.center .who { font-family: var(--font-display); font-size: clamp(1rem, 2.4vw, 1.4rem); }
-.center .facts { font-size: clamp(.62rem, 1.3vw, .78rem); color: var(--muted); line-height: 1.6; }
-.center .dir { font-family: var(--font-mono); font-size: clamp(.6rem, 1.2vw, .72rem); color: var(--needle); letter-spacing: .06em; }
+.center { grid-column: 2 / 4; grid-row: 2 / 4; z-index: 3; display: flex; flex-direction: column; justify-content: space-between; align-items: center; text-align: center; pointer-events: none; padding: 6px; }
+.center .who { font-family: var(--font-display); font-size: clamp(.95rem, 2.2vw, 1.35rem); text-shadow: 0 0 20px #000; }
+.center .facts { font-size: clamp(.58rem, 1.2vw, .74rem); color: var(--muted); line-height: 1.55; text-shadow: 0 0 10px #000; }
+.center .dir { font-family: var(--font-mono); font-size: clamp(.58rem, 1.15vw, .72rem); color: var(--gold); letter-spacing: .06em; text-shadow: 0 0 12px #000; }
 
-.timeline { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; }
-.dx { flex: 0 0 auto; font: inherit; font-size: .75rem; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 4px 10px; cursor: pointer; white-space: nowrap; }
-.dx .mono { font-size: .7rem; }
-.dx[aria-pressed="true"] { color: var(--ink); background: var(--needle); border-color: var(--needle); }
-.dx.now:not([aria-pressed="true"]) { border-color: var(--needle); color: var(--fg); }
+.timeline { display: flex; gap: 6px; overflow-x: auto; padding: 2px 2px 6px; scrollbar-width: thin; }
+.dx { flex: 0 0 auto; font: inherit; font-size: .74rem; color: var(--muted); background: rgba(8,10,16,.6); border: 1px solid var(--edge); border-radius: 999px; padding: 5px 12px; cursor: pointer; white-space: nowrap; transition: all .2s; }
+.dx .mono { font-size: .68rem; }
+.dx[aria-pressed="true"] { color: #1a1408; background: var(--gold); border-color: var(--gold); box-shadow: 0 0 20px -4px var(--gold-glow); }
+.dx.now:not([aria-pressed="true"]) { border-color: rgba(230,196,124,.6); color: var(--fg); }
 
-.detail { background: var(--ink-2); border: 1px solid var(--line); border-radius: 8px; padding: 20px; display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.detail { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
 .detail h3 { font-size: var(--step-2); display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
-.detail h3 .mono { font-size: .8rem; color: var(--muted); }
-.group { display: flex; flex-direction: column; gap: 6px; }
-.group > span { font-family: var(--font-mono); font-size: .7rem; letter-spacing: .1em; color: var(--muted); }
+.detail h3 .mono { font-size: .76rem; color: var(--muted); }
+.group { display: flex; flex-direction: column; gap: 7px; }
+.group > span { font-family: var(--font-mono); font-size: .66rem; letter-spacing: .14em; color: var(--faint); }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.chip { font-size: var(--step--1); border: 1px solid var(--line); border-radius: 4px; padding: 2px 8px; }
-.chip.major { font-family: var(--font-display); font-size: var(--step-0); border-color: var(--needle); }
-.chip.sha { border-color: color-mix(in srgb, var(--ji) 45%, var(--line)); }
-.chip small { color: var(--muted); margin-left: 3px; font-size: .7rem; }
-.sfsz { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
-.sfsz div { border-left: 2px solid var(--needle); padding: 2px 8px; font-size: var(--step--1); }
+.chip { font-size: var(--step--1); border: 1px solid var(--edge); background: rgba(5,6,10,.5); border-radius: 7px; padding: 3px 9px; }
+.chip.major { font-family: var(--font-display); font-size: 1.05rem; border-color: rgba(230,196,124,.55); box-shadow: inset 0 0 14px rgba(230,196,124,.08); }
+.chip.sha { border-color: rgba(227,115,90,.35); }
+.chip small { color: var(--muted); margin-left: 3px; font-size: .68rem; }
+.sfsz { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.sfsz div { border-left: 2px solid var(--gold); background: linear-gradient(90deg, rgba(230,196,124,.07), transparent); padding: 4px 10px; font-size: var(--step--1); border-radius: 0 6px 6px 0; }
 .sfsz div b { font-family: var(--font-display); font-weight: 400; }
-.sfsz div span { color: var(--muted); display: block; font-size: .72rem; }
+.sfsz div span { color: var(--muted); display: block; font-size: .7rem; }
 .patterns { display: flex; flex-wrap: wrap; gap: 6px; }
-.pat { font-family: var(--font-display); border-radius: 999px; padding: 2px 12px; font-size: var(--step--1); border: 1px solid var(--needle); color: var(--needle); }
-.pat.good { border-color: var(--lu); color: var(--lu); }
+.pat { font-family: var(--font-display); border-radius: 999px; padding: 2px 12px; font-size: var(--step--1); border: 1px solid var(--gold); color: var(--gold); box-shadow: 0 0 16px -6px var(--gold-glow); }
+.pat.good { border-color: var(--lu); color: var(--lu); box-shadow: none; }
 
-/* AI 解讀 */
-.ai { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 24px; }
+/* AI */
+.ai { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.9fr); gap: 20px; }
 .asks { display: flex; flex-direction: column; gap: 8px; }
-.ask { font: inherit; font-size: var(--step--1); text-align: left; background: var(--ink-2); color: var(--fg); border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; cursor: pointer; }
-.ask:hover, .ask[aria-pressed="true"] { border-color: var(--needle); }
-.answer { background: var(--ink-2); border: 1px solid var(--line); border-radius: 8px; padding: 20px 24px; min-width: 0; display: flex; flex-direction: column; gap: 12px; max-width: 70ch; }
-.answer h4 { font-family: var(--font-display); font-weight: 700; font-size: var(--step-1); margin: 0; }
-.answer p { color: var(--fg); }
-.answer .meta { font-family: var(--font-mono); font-size: .7rem; color: var(--muted); display: flex; gap: 12px; flex-wrap: wrap; }
-.cursor { display: inline-block; width: .5em; height: 1em; background: var(--needle); vertical-align: -2px; animation: blink 1s steps(2) infinite; }
+.ask { font: inherit; font-size: var(--step--1); text-align: left; background: rgba(8,10,16,.6); color: var(--fg); border: 1px solid var(--edge); border-radius: 12px; padding: 12px 14px; cursor: pointer; transition: border-color .2s; }
+.ask:hover, .ask[aria-pressed="true"] { border-color: rgba(230,196,124,.6); }
+.answer { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.answer h4 { font-size: var(--step-1); font-weight: 700; }
+.answer .meta { font-family: var(--font-mono); font-size: .68rem; color: var(--faint); display: flex; gap: 14px; flex-wrap: wrap; }
+.answer p { max-width: 62ch; }
+.cursor { display: inline-block; width: .5em; height: 1em; background: var(--gold); vertical-align: -2px; box-shadow: 0 0 10px var(--gold); animation: blink 1s steps(2) infinite; }
 @keyframes blink { 50% { opacity: 0; } }
 
-/* Perron 樹 */
-.perron { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; align-items: center; }
-.perron .stage2 { position: relative; aspect-ratio: 4 / 3; width: 100%; background: var(--ink-2); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
-.perron .stage2 canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
-.perron-copy { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
-.perron-copy p { color: var(--muted); max-width: 36em; }
+/* Perron */
+.perron { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 28px; align-items: center; }
+.stage2 { position: relative; aspect-ratio: 4 / 3; width: 100%; border-radius: 16px; overflow: hidden; background: radial-gradient(80% 70% at 50% 100%, rgba(230,196,124,.08), transparent 70%), rgba(5,6,10,.7); border: 1px solid var(--edge); }
+.stage2 canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
 .meter { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-.meter div { border-top: 1px solid var(--line); padding-top: 8px; }
-.meter span { display: block; font-size: .72rem; color: var(--muted); }
-.meter b { font-family: var(--font-mono); font-weight: 500; font-size: var(--step-1); color: var(--needle); }
-input[type="range"] { width: 100%; accent-color: var(--needle); }
+.meter div { border-top: 1px solid var(--edge); padding-top: 8px; }
+.meter span { display: block; font-size: .7rem; color: var(--muted); }
+.meter b { font-family: var(--font-mono); font-weight: 500; font-size: var(--step-1); color: var(--gold); text-shadow: 0 0 14px var(--gold-glow); }
+input[type="range"] { width: 100%; accent-color: var(--gold); }
 
-footer { border-top: 1px solid var(--line); padding-block: 24px 40px; font-size: .75rem; color: var(--muted); display: flex; flex-direction: column; gap: 6px; }
-footer a { color: var(--muted); }
+footer { padding-block: 40px 56px; font-size: .74rem; color: var(--faint); display: flex; flex-direction: column; gap: 6px; border-top: 1px solid var(--edge); }
 
-@media (max-width: 860px) {
-  .hero, .chart-layout, .ai, .perron { grid-template-columns: minmax(0, 1fr); }
-  .hero { padding-block: 32px 16px; }
+@media (max-width: 900px) {
+  .chart-layout, .ai, .perron { grid-template-columns: minmax(0, 1fr); }
+  .theorems { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   form.birth { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .scene-copy.right { margin-left: 0; }
+}
+@media (max-width: 700px) {
+  /* 手機：先讓光場的結構露出一整屏，面板再捲上來 */
+  #s-jiazi .scene-copy, #s-z12 .scene-copy { margin-top: 68vh; }
+  .legend button span { display: none; }
+  .legend button { white-space: nowrap; }
+  .pillar span { white-space: nowrap; font-size: .6rem; }
 }
 @media (max-width: 480px) {
   form.birth { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .board { gap: 2px; }
-  .cell { padding: 4px; }
+  .board { gap: 3px; padding: 3px; }
+  .cell { padding: 4px 5px; }
   .cell .minors, .cell .age { display: none; }
-  .meter b { font-size: var(--step-0); }
   .brand span { display: none; }
+  .pillar b { font-size: 1.25rem; }
+  .meter b { font-size: var(--step-0); }
 }
-@media (prefers-reduced-motion: reduce) { .cursor { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .grain, .scroll-hint i, .cursor { animation: none; } }
 </style>
 
-<div class="wrap">
-  <header class="top">
-    <div class="brand"><b>掛谷紫微</b><span>zhoujiayu.app</span></div>
-    <nav class="main" aria-label="主選單">
-      <a href="#chart" aria-current="page">排盤</a>
-      <a href="#ai">AI 解讀</a>
-      <a href="#perron">掛谷針</a>
-      <a href="#about">古籍</a>
-    </nav>
-  </header>
+<canvas id="field" aria-hidden="true"></canvas>
+<canvas id="labels" aria-hidden="true"></canvas>
+<div class="atmos" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
 
-  <section class="hero" aria-labelledby="hero-title">
-    <div class="hero-copy">
-      <span class="eyebrow">Kakeya needle · 1917</span>
-      <h1 id="hero-title">一根針要轉遍所有方向，<em>最少需要多大的地方？</em></h1>
-      <p class="lede">日本數學家掛谷宗一在 1917 年問了這個問題。答案出人意料：面積可以任意小，但這塊地方的「維度」永遠壓不下去。2025 年王虹與 Joshua Zahl 證明了三維的掛谷猜想。命盤也是這樣一塊地方：十二宮是十二個方向，大限像一根針，一生會轉過每一宮。</p>
-      <dl class="readout" aria-live="polite">
-        <dt>針的方向</dt><dd><strong id="hero-dir">子 ⟷ 午</strong></dd>
-        <dt>指向兩宮</dt><dd id="hero-palace">命宮 ⟷ 遷移</dd>
-        <dt>角度</dt><dd class="mono" id="hero-angle">0.0°</dd>
-      </dl>
-    </div>
-    <div class="stage"><canvas id="deltoid" role="img" aria-label="三尖瓣線內旋轉的掛谷針，外圈標示十二地支"></canvas></div>
-  </section>
-
-  <section class="block" id="chart" aria-labelledby="chart-title">
-    <div class="block-head">
-      <div>
-        <span class="eyebrow">排盤</span>
-        <h2 id="chart-title">命盤</h2>
+<div class="page">
+  <div class="wrap">
+    <header class="top">
+      <div class="bar">
+        <div class="brand">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 L13 11 L22 12 L13 13 L12 22 L11 13 L2 12 L11 11 Z" fill="none" stroke="#e6c47c" stroke-width="1.2"/><line x1="5" y1="19" x2="19" y2="5" stroke="#e6c47c" stroke-width="1.6" stroke-linecap="round"/></svg>
+          <b>掛谷紫微</b><span>bz.zhoujiayu.app</span>
+        </div>
+        <nav class="main" aria-label="主選單">
+          <a href="#s-kakeya" data-nav="0">掛谷</a>
+          <a href="#s-jiazi" data-nav="1">甲子</a>
+          <a href="#s-z12" data-nav="2">十二宮</a>
+          <a href="#chart" data-nav="3">排盤</a>
+          <a href="#ai" data-nav="4">解讀</a>
+        </nav>
       </div>
-      <span class="sample-tag">範例命盤 · 原型示意</span>
-    </div>
-    <form class="birth" id="birth">
-      <div class="field"><label for="f-date">出生日期（國曆）</label><input id="f-date" type="date" value="1990-06-15"></div>
-      <div class="field"><label for="f-time">出生時間</label><input id="f-time" type="time" value="12:10"></div>
-      <div class="field"><label for="f-gender">性別</label><select id="f-gender"><option>女</option><option>男</option></select></div>
-      <div class="field"><label for="f-place">出生地</label><select id="f-place"><option>臺北市</option><option>新北市</option><option>臺中市</option><option>臺南市</option><option>高雄市</option></select></div>
-      <div class="field"><label for="f-name">稱呼（選填）</label><input id="f-name" type="text" placeholder="例：小周"></div>
-      <button class="btn solid" type="submit">排盤</button>
-    </form>
-    <p class="note" id="form-note">原型使用固定的範例命盤（1990 年 6 月 15 日午時，女）。正式版會在瀏覽器裡用排盤引擎即時起盤。</p>
+    </header>
 
-    <div class="chart-layout">
-      <div class="board" id="board">
-        <canvas id="needles" aria-hidden="true"></canvas>
-        <div class="center" id="center"></div>
+    <!-- 0 · 掛谷集合 -->
+    <section class="hero" id="s-kakeya" data-scene="0" aria-labelledby="hero-title">
+      <span class="eyebrow">Kakeya conjecture · 1917 → 2025</span>
+      <h1 id="hero-title">命盤是一個<em>包含所有方向</em>的集合</h1>
+      <p class="lede">1917 年掛谷宗一問：一根針要在平面上轉遍所有方向，最少需要多大的地方？面積可以小到任意程度，維度卻永遠壓不下去。背後這片光，是三維空間裡每個方向各一根針；2025 年，王虹與 Joshua Zahl 證明了這樣的集合必然是滿三維的。紫微斗數也是一套「方向」的學問：十二宮、三方四正、大限流轉，一生會走過每個方向。</p>
+      <div class="theorems">
+        <div><span class="y">1917</span><b>掛谷針問題</b><span>轉一圈的最小面積？</span></div>
+        <div><span class="y">1928</span><b>Besicovitch</b><span>面積可以任意小</span></div>
+        <div><span class="y">1971</span><b>Davies</b><span>平面掛谷集合維度為 2</span></div>
+        <div><span class="y">2025</span><b>王虹 · Zahl</b><span>三維掛谷猜想成立</span></div>
       </div>
-      <aside class="detail" id="detail" aria-live="polite"></aside>
-    </div>
-    <div class="group">
-      <span>大限 · 點選切換，針會轉向該宮</span>
-      <div class="timeline" id="timeline" role="group" aria-label="大限"></div>
-    </div>
-  </section>
+      <div class="scroll-hint"><i></i>向下捲動，光針會重新排列</div>
+    </section>
 
-  <section class="block" id="ai" aria-labelledby="ai-title">
-    <div class="block-head">
-      <div>
-        <span class="eyebrow">Claude 解讀</span>
-        <h2 id="ai-title">問這張盤</h2>
+    <!-- 1 · 六十甲子 -->
+    <section class="scene" id="s-jiazi" data-scene="1" aria-labelledby="jiazi-title">
+      <div class="scene-copy right glass">
+        <span class="eyebrow">Chinese remainder theorem</span>
+        <h2 id="jiazi-title">六十甲子是一條 (6, 5) 環面紐結</h2>
+        <p>十天干與十二地支各自循環，配對起來卻只有 60 組，不是 120 組：因為 gcd(10, 12) = 2，陽干只配陽支、陰干只配陰支。把天干當成環面的一圈、地支當成另一圈，六十甲子走完一輪，正好繞了 6 圈和 5 圈，首尾相接成一個紐結。</p>
+        <div class="formula">n ↦ (n mod 10, n mod 12)　<span class="c">// 循環群 ℤ₁₀ × ℤ₁₂ 中 (1,1) 生成的子群</span><br>週期 = lcm(10, 12) = 60　<span class="c">// 繞數 (60/10, 60/12) = (6, 5)</span></div>
+        <div class="pillars" id="pillars"></div>
+        <p class="small">範例命盤的年、月、日、時四柱，在紐結上以亮點標出，數字是它在六十甲子裡的序號。</p>
       </div>
-      <span class="sample-tag">版面示意 · 非真實解讀</span>
-    </div>
-    <div class="ai">
-      <div class="asks" role="group" aria-label="常見問題">
-        <button class="ask" type="button" aria-pressed="true">命格總覽：我是怎樣的人？</button>
-        <button class="ask" type="button" aria-pressed="false">事業：適合往哪個方向走？</button>
-        <button class="ask" type="button" aria-pressed="false">這個大限（36–45 歲）要注意什麼？</button>
-        <button class="ask" type="button" aria-pressed="false">感情與婚姻</button>
-      </div>
-      <article class="answer">
-        <div class="meta"><span>依據：命宮 武曲·天府</span><span>格局：府相朝垣</span><span>串流中</span></div>
-        <h4>命格總覽</h4>
-        <p>命宮在子，武曲化權與天府同坐，三方會到紫微、天相，構成府相朝垣。這一段會依倪師「命宮為本、三方為用」的看法，先講性格底色，再講三方帶來的助力……<span class="cursor" aria-hidden="true"></span></p>
-        <p class="note">正式版的文字由 Claude 依這張盤即時產生，逐字串流顯示；引用倪師或《全書》只用查得到的原話。</p>
-      </article>
-    </div>
-  </section>
+    </section>
 
-  <section class="block" id="perron" aria-labelledby="perron-title">
-    <div class="perron">
-      <div class="perron-copy">
-        <span class="eyebrow">Besicovitch · Perron tree</span>
-        <h2 id="perron-title">把同樣多的方向，擠進更小的面積</h2>
-        <p>左邊是一個三角形切成 128 根細針，每根針的方向都不一樣。把它們沿底邊互相平移、交疊，方向一個都沒少，佔的面積卻變小。Besicovitch 用這個辦法證明了：讓針轉一圈的區域，面積可以小到任意程度。</p>
-        <p>拖動滑桿看面積怎麼變。擠過頭，針尖反而會散開，面積又變大。</p>
-        <label class="note" for="squeeze">交疊程度</label>
-        <input id="squeeze" type="range" min="0" max="100" value="0">
-        <div class="meter">
-          <div><span>針的數量</span><b>128</b></div>
-          <div><span>涵蓋方向</span><b id="spread">—</b></div>
-          <div><span>面積（原本 = 100）</span><b id="area">100.0</b></div>
+    <!-- 2 · ℤ/12 -->
+    <section class="scene" id="s-z12" data-scene="2" aria-labelledby="z12-title">
+      <div class="scene-copy glass">
+        <span class="eyebrow">Cyclic group ℤ/12</span>
+        <h2 id="z12-title">三合是陪集，對宮是對合</h2>
+        <p>十二地支就是 ℤ/12。子辰申 = {0, 4, 8} 是 4 生成的子群，另外三組三合都是它的陪集，四個三角形剛好就是水、金、火、木四局。對宮是 x ↦ x + 6，十二宮兩兩相對，連成六根穿過中心的針。三方四正就是「陪集 ∪ 對宮」。</p>
+        <div class="formula">三合(x) = x + ⟨4⟩ = {x, x+4, x+8}<br>對宮(x) = x + 6　<span class="c">// ℤ/12 中唯一的 2 階元素</span><br>大限：每 10 年走一宮，方向 ±1　<span class="c">// 陽男陰女順行，陰男陽女逆行</span></div>
+        <div class="legend" id="legend" role="group" aria-label="三合四局">
+          <button type="button" data-set="0" style="color: var(--water)"><i style="background: var(--water)"></i><b>水局</b> 申子辰<span>0+⟨4⟩</span></button>
+          <button type="button" data-set="1" style="color: var(--metal)"><i style="background: var(--metal)"></i><b>金局</b> 巳酉丑<span>1+⟨4⟩</span></button>
+          <button type="button" data-set="2" style="color: var(--fire)"><i style="background: var(--fire)"></i><b>火局</b> 寅午戌<span>2+⟨4⟩</span></button>
+          <button type="button" data-set="3" style="color: var(--wood)"><i style="background: var(--wood)"></i><b>木局</b> 亥卯未<span>3+⟨4⟩</span></button>
         </div>
       </div>
-      <div class="stage2"><canvas id="tree" role="img" aria-label="Perron 樹：128 根細三角形針交疊後的形狀"></canvas></div>
-    </div>
-  </section>
+    </section>
 
-  <footer id="about">
-    <span>排盤引擎改自開源專案 ziwei-doushu（MIT，作者 王多魚AI，github.com/Renhuai123/ziwei-doushu），內核基於 iztro 與 lunar-javascript。</span>
-    <span>倪海厦《天紀》原話依 CC BY-NC-SA 4.0 標註出處，僅供非商業學習研究。命理內容僅供參考。</span>
-  </footer>
+    <!-- 3 · 命盤 -->
+    <section class="scene" id="chart" data-scene="3" aria-labelledby="chart-title">
+      <div class="chart-head">
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <span class="eyebrow">排盤</span>
+          <h2 id="chart-title">針在盤中轉向三方四正</h2>
+        </div>
+        <span class="tag">範例命盤 · 原型示意</span>
+      </div>
+      <form class="birth glass" id="birth">
+        <div class="field"><label for="f-date">出生日期（國曆）</label><input id="f-date" type="date" value="1990-06-15"></div>
+        <div class="field"><label for="f-time">出生時間</label><input id="f-time" type="time" value="12:10"></div>
+        <div class="field"><label for="f-gender">性別</label><select id="f-gender"><option>女</option><option>男</option></select></div>
+        <div class="field"><label for="f-place">出生地</label><select id="f-place"><option>臺北市</option><option>新北市</option><option>臺中市</option><option>臺南市</option><option>高雄市</option></select></div>
+        <div class="field"><label for="f-name">稱呼（選填）</label><input id="f-name" type="text" placeholder="例：小周"></div>
+        <button class="btn" type="submit">排盤</button>
+      </form>
+      <p class="note" id="form-note">原型使用固定的範例命盤（1990 年 6 月 15 日午時，女）。正式版會在瀏覽器裡用排盤引擎即時起盤。</p>
+      <div class="chart-layout">
+        <div class="board" id="board">
+          <canvas id="needles" aria-hidden="true"></canvas>
+          <div class="center" id="center"></div>
+        </div>
+        <aside class="detail glass" id="detail" aria-live="polite"></aside>
+      </div>
+      <div class="group">
+        <span>大限 · 點選後，盤心三尖瓣線裡的針會轉向那一宮</span>
+        <div class="timeline" id="timeline" role="group" aria-label="大限"></div>
+      </div>
+    </section>
+
+    <!-- 4 · AI -->
+    <section class="scene" id="ai" data-scene="4" aria-labelledby="ai-title">
+      <div class="chart-head">
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <span class="eyebrow">Claude 解讀</span>
+          <h2 id="ai-title">問這張盤</h2>
+        </div>
+        <span class="tag">版面示意 · 非真實解讀</span>
+      </div>
+      <div class="ai">
+        <div class="asks" role="group" aria-label="常見問題">
+          <button class="ask" type="button" aria-pressed="true">命格總覽：我是怎樣的人？</button>
+          <button class="ask" type="button" aria-pressed="false">事業：適合往哪個方向走？</button>
+          <button class="ask" type="button" aria-pressed="false">這個大限（36–45 歲）要注意什麼？</button>
+          <button class="ask" type="button" aria-pressed="false">感情與婚姻</button>
+        </div>
+        <article class="answer glass">
+          <div class="meta"><span>依據：命宮 武曲·天府</span><span>格局：府相朝垣</span><span>串流中</span></div>
+          <h4>命格總覽</h4>
+          <p>命宮在子，武曲化權與天府同坐，三方會到紫微、天相，構成府相朝垣。這一段會依倪師「命宮為本、三方為用」的看法，先講性格底色，再講三方帶來的助力……<span class="cursor" aria-hidden="true"></span></p>
+          <p class="note">正式版的文字由 Claude 依這張盤即時產生、逐字串流；引用倪師或《全書》只用查得到的原話。</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- 5 · Perron -->
+    <section class="scene" id="perron" data-scene="5" aria-labelledby="perron-title">
+      <div class="perron">
+        <div class="scene-copy">
+          <span class="eyebrow">Besicovitch · Perron tree</span>
+          <h2 id="perron-title">同樣多的方向，擠進更小的面積</h2>
+          <p>一個三角形切成 128 根細針，每根方向都不同。沿底邊把它們互相平移、交疊，方向一個都沒少，面積卻變小。Besicovitch 用這個辦法證明：讓針轉一圈的區域，面積可以小到任意程度。擠過頭，針尖反而散開，面積又變大。</p>
+          <label class="note" for="squeeze">交疊程度</label>
+          <input id="squeeze" type="range" min="0" max="100" value="0">
+          <div class="meter">
+            <div><span>針的數量</span><b>128</b></div>
+            <div><span>涵蓋方向</span><b id="spread">—</b></div>
+            <div><span>面積（原本 = 100）</span><b id="area">100.0</b></div>
+          </div>
+        </div>
+        <div class="stage2"><canvas id="tree" role="img" aria-label="Perron 樹：128 根細三角形針交疊後的形狀"></canvas></div>
+      </div>
+    </section>
+
+    <footer>
+      <span>排盤引擎改自開源專案 ziwei-doushu（MIT，作者 王多魚AI，github.com/Renhuai123/ziwei-doushu），內核基於 iztro 與 lunar-javascript。光場以 three.js 繪製。</span>
+      <span>倪海厦《天紀》原話依 CC BY-NC-SA 4.0 標註出處，僅供非商業學習研究。命理內容僅供參考。</span>
+    </footer>
+  </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/shaders/CopyShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/EffectComposer.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/RenderPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/ShaderPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
 <script>
 const CHART = {"lunar":{"lunarYear":1990,"lunarMonth":5,"lunarDay":23,"yearStem":6,"yearBranch":6,"isLeapMonth":false,"fourPillars":["庚午","壬午","辛亥","甲午"],"fourPillarsLunar":["庚午","壬午","辛亥","甲午"]},"ju":"火六局","mingZhu":"貪狼","shenZhu":"火星","yy":"陽女","ming":0,"shen":0,"age":37,"curDx":3,"palaces":[{"b":2,"s":4,"n":"福德","dx":[106,115],"stars":[{"n":"貪狼","t":"major","br":"平","h":""},{"n":"天廚","t":"minor","br":"","h":""},{"n":"蜚廉","t":"sha","br":"","h":""}],"borrow":null},{"b":3,"s":5,"n":"田宅","dx":[96,105],"stars":[{"n":"天機","t":"major","br":"旺","h":""},{"n":"巨門","t":"major","br":"廟","h":""},{"n":"天喜","t":"lucky","br":"旺","h":""},{"n":"咸池","t":"minor","br":"平","h":""},{"n":"天德","t":"lucky","br":"平","h":""}],"borrow":null},{"b":4,"s":6,"n":"官祿","dx":[86,95],"stars":[{"n":"紫微","t":"major","br":"得","h":""},{"n":"天相","t":"major","br":"得","h":""},{"n":"文昌","t":"lucky","br":"得","h":""},{"n":"鳳閣","t":"lucky","br":"陷","h":""},{"n":"寡宿","t":"sha","br":"陷","h":""},{"n":"年解","t":"lucky","br":"廟","h":""}],"borrow":null},{"b":5,"s":7,"n":"僕役","dx":[76,85],"stars":[{"n":"天梁","t":"major","br":"得","h":""},{"n":"地空","t":"sha","br":"廟","h":""},{"n":"地劫","t":"sha","br":"不","h":""},{"n":"天姚","t":"minor","br":"平","h":""},{"n":"天巫","t":"lucky","br":"","h":""},{"n":"破碎","t":"minor","br":"陷","h":""},{"n":"天傷","t":"sha","br":"平","h":""}],"borrow":null},{"b":6,"s":8,"n":"遷移","dx":[66,75],"stars":[{"n":"七殺","t":"major","br":"旺","h":""},{"n":"右弼","t":"lucky","br":"旺","h":""},{"n":"三臺","t":"lucky","br":"旺","h":""},{"n":"天才","t":"lucky","br":"旺","h":""},{"n":"天壽","t":"lucky","br":"平","h":""},{"n":"天福","t":"lucky","br":"平","h":""},{"n":"截空","t":"sha","br":"廟","h":""},{"n":"陰煞","t":"sha","br":"","h":""}],"borrow":null},{"b":7,"s":9,"n":"疾厄","dx":[56,65],"stars":[{"n":"天鉞","t":"lucky","br":"旺","h":""},{"n":"火星","t":"sha","br":"利","h":""},{"n":"陀羅","t":"sha","br":"廟","h":""},{"n":"天貴","t":"lucky","br":"旺","h":""},{"n":"天月","t":"sha","br":"","h":""},{"n":"天空","t":"sha","br":"陷","h":""},{"n":"副截","t":"sha","br":"廟","h":""},{"n":"天使","t":"sha","br":"平","h":""}],"borrow":["太陽","太陰"]},{"b":8,"s":0,"n":"財帛","dx":[46,55],"stars":[{"n":"廉貞","t":"major","br":"廟","h":""},{"n":"左輔","t":"lucky","br":"平","h":""},{"n":"祿存","t":"lucky","br":"廟","h":""},{"n":"天馬","t":"lucky","br":"旺","h":""},{"n":"八座","t":"lucky","br":"廟","h":""},{"n":"封誥","t":"lucky","br":"","h":""},{"n":"孤辰","t":"sha","br":"平","h":""}],"borrow":null},{"b":9,"s":1,"n":"子女","dx":[36,45],"stars":[{"n":"鈴星","t":"sha","br":"得","h":""},{"n":"擎羊","t":"sha","br":"陷","h":""},{"n":"紅鸞","t":"lucky","br":"旺","h":""}],"borrow":["天機","巨門"]},{"b":10,"s":2,"n":"夫妻","dx":[26,35],"stars":[{"n":"破軍","t":"major","br":"旺","h":""},{"n":"文曲","t":"lucky","br":"陷","h":""},{"n":"龍池","t":"lucky","br":"陷","h":""},{"n":"華蓋","t":"lucky","br":"平","h":""},{"n":"旬空","t":"sha","br":"陷","h":""}],"borrow":null},{"b":11,"s":3,"n":"兄弟","dx":[16,25],"stars":[{"n":"天同","t":"major","br":"廟","h":"忌"},{"n":"天官","t":"lucky","br":"旺","h":""},{"n":"月德","t":"lucky","br":"","h":""},{"n":"劫煞","t":"minor","br":"","h":""},{"n":"副旬","t":"sha","br":"平","h":""}],"borrow":null},{"b":0,"s":4,"n":"命宮","dx":[6,15],"stars":[{"n":"武曲","t":"major","br":"旺","h":"權"},{"n":"天府","t":"major","br":"廟","h":""},{"n":"解神","t":"lucky","br":"廟","h":""},{"n":"臺輔","t":"lucky","br":"","h":""},{"n":"天哭","t":"sha","br":"平","h":""},{"n":"天虛","t":"sha","br":"陷","h":""}],"borrow":null},{"b":1,"s":5,"n":"父母","dx":[116,125],"stars":[{"n":"太陽","t":"major","br":"不","h":"祿"},{"n":"太陰","t":"major","br":"廟","h":"科"},{"n":"天魁","t":"lucky","br":"旺","h":""},{"n":"恩光","t":"lucky","br":"廟","h":""},{"n":"天刑","t":"sha","br":"陷","h":""},{"n":"龍德","t":"minor","br":"","h":""},{"n":"大耗","t":"sha","br":"平","h":""}],"borrow":null}],"daXians":[{"a":6,"z":15,"b":0,"n":"命宮"},{"a":16,"z":25,"b":11,"n":"兄弟"},{"a":26,"z":35,"b":10,"n":"夫妻"},{"a":36,"z":45,"b":9,"n":"子女"},{"a":46,"z":55,"b":8,"n":"財帛"},{"a":56,"z":65,"b":7,"n":"疾厄"},{"a":66,"z":75,"b":6,"n":"遷移"},{"a":76,"z":85,"b":5,"n":"僕役"},{"a":86,"z":95,"b":4,"n":"官祿"},{"a":96,"z":105,"b":3,"n":"田宅"},{"a":106,"z":115,"b":2,"n":"福德"},{"a":116,"z":125,"b":1,"n":"父母"}],"patterns":[{"name":"府相朝垣","level":"excellent"},{"name":"日月同宮","level":"good"},{"name":"輔弼同會","level":"good"}]};
 
 const BRANCH = '子丑寅卯辰巳午未申酉戌亥';
 const STEM = '甲乙丙丁戊己庚辛壬癸';
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const small = matchMedia('(max-width: 700px)').matches;
 const byBranch = {};
 CHART.palaces.forEach(p => { byBranch[p.b] = p; });
 const pname = b => { const n = byBranch[b].n; return n.endsWith('宮') ? n : n + '宮'; };
-
-function css(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
-function fitCanvas(cv) {
-  const r = cv.getBoundingClientRect(), dpr = Math.min(devicePixelRatio || 1, 2);
-  const w = Math.max(1, Math.round(r.width * dpr)), h = Math.max(1, Math.round(r.height * dpr));
-  if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
-  const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  return { ctx, w: r.width, h: r.height };
-}
 // 地支方位：子在下、午在上、卯在左、酉在右（與方盤一致），數學座標 y 朝上
 const branchAngle = b => (270 - 30 * b) * Math.PI / 180;
+const ganzhiIndex = gz => { const s = STEM.indexOf(gz[0]), b = BRANCH.indexOf(gz[1]); for (let n = 0; n < 60; n++) if (n % 10 === s && n % 12 === b) return n; return -1; };
+const PILLARS = CHART.lunar.fourPillars.map((gz, i) => ({ gz, n: ganzhiIndex(gz), label: ['年柱', '月柱', '日柱', '時柱'][i] }));
+const TRINE_SETS = [[8, 0, 4], [5, 9, 1], [2, 6, 10], [11, 3, 7]];        // 水 金 火 木
+const TRINE_COLORS = ['#6ea8e0', '#d9dde8', '#e57a5c', '#7fc795'];
+const TRINE_NAMES = ['水', '金', '火', '木'];
+let trineFocus = -1;
 
-/* ───────── 首屏：三尖瓣線（deltoid）裡的掛谷針 ───────── */
-(() => {
-  const cv = document.getElementById('deltoid');
-  const N = 900;
-  const unit = [];
+/* ───────────────── WebGL 光場 ───────────────── */
+const sceneState = { f: 0, focusTrine: -1 };
+(function field() {
+  const canvas = document.getElementById('field');
+  const lab = document.getElementById('labels');
+  const lctx = lab.getContext('2d');
+  let renderer;
+  try {
+    if (!window.THREE) throw new Error('three missing');
+    renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+  } catch (e) { document.documentElement.classList.add('no-webgl'); return; }
+  const DPR = Math.min(devicePixelRatio || 1, small ? 1.5 : 2);
+  renderer.setPixelRatio(DPR);
+  renderer.setClearColor(0x05060a, 1);
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
+  camera.position.set(0, 0, 6.2);
+
+  const N = small ? 960 : 1440;                     // 光針數；60 與 30 的倍數
+  const V = N * 2;
+  const rnd = (() => { let s = 7; return () => (s = (s * 16807) % 2147483647) / 2147483647; })();
+  const seed = new Float32Array(N); for (let i = 0; i < N; i++) seed[i] = rnd();
+  const hex = h => { const c = new THREE.Color(h); return [c.r, c.g, c.b]; };
+  const GOLD = hex('#e6c47c'), GOLD_HI = hex('#fff1c8'), BLUE = hex('#7f98d8'), DIM = hex('#3a4258');
+
+  // 每個場景是一組 N 根線段的端點與顏色
+  function makeState() { return { p: new Float32Array(V * 3), c: new Float32Array(V * 3), spin: 0, tilt: 0, dx: 0 }; }
+  function setSeg(st, i, a, b, ca, cb) { st.p.set(a, i * 6); st.p.set(b, i * 6 + 3); st.c.set(ca, i * 6); st.c.set(cb || ca, i * 6 + 3); }
+  const mix3 = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
+
+  // 0 掛谷集合：半球面上 N 個方向（費氏格點），每根針穿過球心附近
+  const K = makeState(); K.spin = 1; K.tilt = 0.35; K.dx = small ? 0 : 1.9;
   for (let i = 0; i < N; i++) {
-    const t = i / N * 2 * Math.PI;
-    unit.push([2 * Math.cos(t) + Math.cos(2 * t), 2 * Math.sin(t) - Math.sin(2 * t)]);
+    const z = 1 - (i + 0.5) / N, r = Math.sqrt(1 - z * z), th = i * Math.PI * (3 - Math.sqrt(5));
+    const d = [r * Math.cos(th), r * Math.sin(th), z];
+    const u = Math.cbrt(seed[i]) * 1.05, a1 = seed[(i * 7) % N] * Math.PI * 2, a2 = Math.acos(2 * seed[(i * 13) % N] - 1);
+    const c = [u * Math.sin(a2) * Math.cos(a1), u * Math.sin(a2) * Math.sin(a1), u * Math.cos(a2)];
+    const L = 1.15 + seed[(i * 3) % N] * 0.35;
+    const col = mix3(GOLD, BLUE, Math.pow(seed[(i * 11) % N], 2.2));
+    setSeg(K, i, [c[0] - d[0] * L, c[1] - d[1] * L, c[2] - d[2] * L], [c[0] + d[0] * L, c[1] + d[1] * L, c[2] + d[2] * L], col.map(x => x * 0.1), col.map(x => x * 0.34));
   }
-  // 參數 t 的切線方向是 e^{-it/2}；用數值求這條切線和曲線的交點，取最遠兩點就是長度 4 的針
-  function needle(t) {
-    const px = 2 * Math.cos(t) + Math.cos(2 * t), py = 2 * Math.sin(t) - Math.sin(2 * t);
-    const dx = Math.cos(-t / 2), dy = Math.sin(-t / 2);
-    let lo = 0, hi = 0;
-    for (let i = 0; i < N; i++) {
-      const [ax, ay] = unit[i], [bx, by] = unit[(i + 1) % N];
-      const ex = bx - ax, ey = by - ay, den = dx * ey - dy * ex;
-      if (Math.abs(den) < 1e-12) continue;
-      const qx = ax - px, qy = ay - py;
-      const lam = (qx * ey - qy * ex) / den, mu = (qx * dy - qy * dx) / den;
-      if (mu >= 0 && mu <= 1) { if (lam < lo) lo = lam; if (lam > hi) hi = lam; }
-    }
-    return [px + dx * lo, py + dy * lo, px + dx * hi, py + dy * hi];
+  // 1 六十甲子：(6,5) 環面紐結 t ↦ ((R + r cos 2πt/10) cos 2πt/12, …, r sin 2πt/10)
+  const T = makeState(); T.spin = 0.45; T.tilt = 1.05; T.dx = small ? 0 : -1.7;
+  const knot = t => { const a = 2 * Math.PI * t / 10, b = 2 * Math.PI * t / 12, R = 1.45, r = 0.55; return [(R + r * Math.cos(a)) * Math.cos(b), (R + r * Math.cos(a)) * Math.sin(b), r * Math.sin(a)]; };
+  for (let i = 0; i < N; i++) {
+    const t0 = i * 60 / N, t1 = (i + 1) * 60 / N;
+    const near = PILLARS.some(p => Math.abs(((t0 - p.n + 30) % 60 + 60) % 60 - 30) < 0.9);
+    const col = near ? GOLD_HI : mix3(GOLD, BLUE, 0.5 + 0.5 * Math.sin(2 * Math.PI * t0 / 60));
+    setSeg(T, i, knot(t0), knot(t1), col.map(x => x * (near ? 1.4 : 0.95)));
   }
-  const trail = [];
-  let t = 0.35, last = performance.now();
-  const dirEl = document.getElementById('hero-dir'), palEl = document.getElementById('hero-palace'), angEl = document.getElementById('hero-angle');
-  let lastPair = -1;
+  // 2 ℤ/12：十二邊形 + 六根對宮直徑 + 四個三合三角形，共 30 條邊
+  const Z = makeState(); Z.spin = 0; Z.tilt = 0; Z.dx = small ? 0 : 1.4;
+  const ZR = 1.6, vert = b => [Math.cos(branchAngle(b)) * ZR, Math.sin(branchAngle(b)) * ZR, 0];
+  const edges = [];
+  for (let b = 0; b < 12; b++) edges.push([b, (b + 1) % 12, DIM, -1]);
+  for (let b = 0; b < 6; b++) edges.push([b, b + 6, GOLD, -1]);
+  TRINE_SETS.forEach((set, k) => { const col = hex(TRINE_COLORS[k]); for (let j = 0; j < 3; j++) edges.push([set[j], set[(j + 1) % 3], col, k]); });
+  const perEdge = N / edges.length;
+  const zEdgeOf = new Int8Array(N);
+  for (let i = 0; i < N; i++) {
+    const e = edges[Math.floor(i / perEdge)], k = i % perEdge;
+    const A = vert(e[0]), B = vert(e[1]);
+    const s0 = k / perEdge, s1 = (k + 1) / perEdge, j = (seed[i] - 0.5) * 0.025;
+    setSeg(Z, i, [A[0] + (B[0] - A[0]) * s0, A[1] + (B[1] - A[1]) * s0 + j, j * 4], [A[0] + (B[0] - A[0]) * s1, A[1] + (B[1] - A[1]) * s1 + j, j * 4], e[2]);
+    zEdgeOf[i] = e[3];
+  }
+  // 3+ 背景霧：同一組掛谷針放大、變暗，退到內容後方
+  const H = makeState(); H.spin = 0.25; H.tilt = 0.2;
+  for (let i = 0; i < V * 3; i++) { H.p[i] = K.p[i] * 2.3; H.c[i] = K.c[i] * 0.22; }
+  const STATES = [K, T, Z, H, H, H];
+
+  const geo = new THREE.BufferGeometry();
+  const pos = new Float32Array(V * 3), col = new Float32Array(V * 3);
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3).setUsage(THREE.DynamicDrawUsage));
+  geo.setAttribute('aColor', new THREE.BufferAttribute(col, 3).setUsage(THREE.DynamicDrawUsage));
+  const lineMat = new THREE.ShaderMaterial({
+    uniforms: { uGain: { value: 1 } },
+    vertexShader: `attribute vec3 aColor; varying vec3 vC; varying float vA; uniform float uGain;
+      void main(){ vec4 mv = modelViewMatrix * vec4(position,1.0); gl_Position = projectionMatrix * mv;
+        float d = -mv.z; vA = uGain * clamp(1.9 - d * 0.22, 0.12, 1.0); vC = aColor; }`,
+    fragmentShader: `varying vec3 vC; varying float vA; void main(){ gl_FragColor = vec4(vC, vA); }`,
+    transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+  });
+  const lines = new THREE.LineSegments(geo, lineMat);
+  scene.add(lines);
+
+  // 星塵：遠景兩千顆，慢速閃爍，提供景深
+  const SN = small ? 900 : 2000, sp = new Float32Array(SN * 3), ss = new Float32Array(SN);
+  for (let i = 0; i < SN; i++) {
+    const r = 9 + rnd() * 16, a = rnd() * Math.PI * 2, z = rnd() * 2 - 1;
+    sp[i * 3] = r * Math.sqrt(1 - z * z) * Math.cos(a); sp[i * 3 + 1] = r * Math.sqrt(1 - z * z) * Math.sin(a); sp[i * 3 + 2] = r * z - 6; ss[i] = rnd();
+  }
+  const sg = new THREE.BufferGeometry();
+  sg.setAttribute('position', new THREE.BufferAttribute(sp, 3)); sg.setAttribute('aS', new THREE.BufferAttribute(ss, 1));
+  const starMat = new THREE.ShaderMaterial({
+    uniforms: { uT: { value: 0 }, uDpr: { value: DPR } },
+    vertexShader: `attribute float aS; uniform float uT; uniform float uDpr; varying float vA;
+      void main(){ vec4 mv = modelViewMatrix * vec4(position,1.0); gl_Position = projectionMatrix * mv;
+        gl_PointSize = (0.6 + aS * 1.6) * uDpr; vA = 0.25 + 0.55 * (0.5 + 0.5 * sin(uT * (0.6 + aS * 1.8) + aS * 40.0)); }`,
+    fragmentShader: `varying float vA; void main(){ vec2 p = gl_PointCoord - 0.5; float d = length(p); if (d > 0.5) discard; gl_FragColor = vec4(vec3(0.85,0.86,0.95), vA * (1.0 - d * 2.0)); }`,
+    transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+  });
+  const stars = new THREE.Points(sg, starMat);
+  scene.add(stars);
+
+  // 六十甲子節點（四柱高亮）
+  const kn = new Float32Array(60 * 3), ks = new Float32Array(60);
+  const kg = new THREE.BufferGeometry();
+  for (let n = 0; n < 60; n++) ks[n] = PILLARS.some(p => p.n === n) ? 1 : 0;
+  kg.setAttribute('position', new THREE.BufferAttribute(kn, 3).setUsage(THREE.DynamicDrawUsage)); kg.setAttribute('aHi', new THREE.BufferAttribute(ks, 1));
+  const nodeMat = new THREE.ShaderMaterial({
+    uniforms: { uA: { value: 0 }, uDpr: { value: DPR }, uT: { value: 0 } },
+    vertexShader: `attribute float aHi; uniform float uDpr; uniform float uT; varying float vHi;
+      void main(){ vec4 mv = modelViewMatrix * vec4(position,1.0); gl_Position = projectionMatrix * mv; vHi = aHi;
+        gl_PointSize = (aHi > 0.5 ? 13.0 + 3.0 * sin(uT * 2.2) : 4.0) * uDpr * (6.0 / -mv.z); }`,
+    fragmentShader: `uniform float uA; varying float vHi; void main(){ vec2 p = gl_PointCoord - 0.5; float d = length(p); if (d > 0.5) discard;
+        float core = smoothstep(0.5, 0.0, d); vec3 c = vHi > 0.5 ? vec3(1.0, 0.92, 0.7) : vec3(0.75, 0.72, 0.62);
+        gl_FragColor = vec4(c, uA * core * (vHi > 0.5 ? 1.0 : 0.55)); }`,
+    transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+  });
+  const nodes = new THREE.Points(kg, nodeMat);
+  scene.add(nodes);
+
+  // 後製：Unreal bloom 讓交疊處發光
+  const composer = new THREE.EffectComposer(renderer);
+  composer.addPass(new THREE.RenderPass(scene, camera));
+  const bloom = new THREE.UnrealBloomPass(new THREE.Vector2(256, 256), 0.95, 0.6, 0.08);
+  composer.addPass(bloom);
+
+  function resize() {
+    const w = innerWidth, h = innerHeight;
+    renderer.setSize(w, h, false); composer.setSize(w, h);
+    camera.aspect = w / h;
+    camera.position.z = w < h ? 8.4 : 6.2;           // 直式螢幕退遠一點，讓結構完整入鏡
+    camera.updateProjectionMatrix();
+    lab.width = Math.round(w * DPR); lab.height = Math.round(h * DPR); lctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  }
+  addEventListener('resize', resize); resize();
+
+  // 捲動 → 場景索引 f（小數）。每個 section 的中心對到視窗中心時 f 為整數
+  const sections = [...document.querySelectorAll('[data-scene]')];
+  function scrollF() {
+    const mid = innerHeight * 0.5, cs = sections.map(s => { const r = s.getBoundingClientRect(); return r.top + Math.min(r.height, innerHeight) * 0.5; });
+    if (mid <= cs[0]) return 0;
+    for (let i = 0; i < cs.length - 1; i++) if (mid <= cs[i + 1]) return i + (mid - cs[i]) / (cs[i + 1] - cs[i]);
+    return cs.length - 1;
+  }
+  const navLinks = [...document.querySelectorAll('[data-nav]')];
+
+  const rotY = (v, a, tilt, out, o) => {
+    const ca = Math.cos(a), sa = Math.sin(a), ct = Math.cos(tilt), st = Math.sin(tilt);
+    const x = v[o] * ca + v[o + 2] * sa, z = -v[o] * sa + v[o + 2] * ca, y = v[o + 1];
+    out[0] = x; out[1] = y * ct - z * st; out[2] = y * st + z * ct;
+  };
+  const rotS = (st, a, out, o) => { rotY(st.p, a, st.tilt, out, o); out[0] += st.dx; };
+  const ease = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  let fSmooth = 0, phase = 0, last = performance.now(), mx = 0, my = 0, pmx = 0, pmy = 0;
+  addEventListener('pointermove', e => { mx = e.clientX / innerWidth - 0.5; my = e.clientY / innerHeight - 0.5; });
+  const A = [0, 0, 0], B = [0, 0, 0];
+  const proj = new THREE.Vector3();
+  const zTrineGain = new Float32Array(4).fill(1);
 
   function frame(now) {
-    const dt = Math.min(64, now - last); last = now;
-    if (!reduceMotion) t += dt * 0.00022;
-    const { ctx, w, h } = fitCanvas(cv);
-    const cx = w / 2, cy = h / 2, R = Math.min(w, h) * 0.47, s = R / 3.6;
-    const gold = css('--needle'), fg = css('--fg'), muted = css('--muted'), line = css('--line');
-    ctx.clearRect(0, 0, w, h);
+    const dt = Math.min(50, now - last) / 1000; last = now;
+    const f = scrollF();
+    fSmooth += (f - fSmooth) * (reduceMotion ? 1 : Math.min(1, dt * 4));
+    const i0 = Math.max(0, Math.min(STATES.length - 1, Math.floor(fSmooth))), i1 = Math.min(STATES.length - 1, i0 + 1);
+    const raw = fSmooth - i0;
+    const blend = Math.min(1, Math.max(0, (raw - 0.18) / 0.64));   // 讀文字時停住，兩段之間才變形
+    const S0 = STATES[i0], S1 = STATES[i1];
+    if (!reduceMotion) phase += dt * 0.12;
+    const a0 = phase * S0.spin, a1 = phase * S1.spin;
+    pmx += (mx - pmx) * 0.05; pmy += (my - pmy) * 0.05;
+    for (let k = 0; k < 4; k++) zTrineGain[k] += (((trineFocus < 0 || trineFocus === k) ? 1 : 0.18) - zTrineGain[k]) * 0.1;
 
-    // 外圈十二地支
-    ctx.strokeStyle = line; ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.arc(cx, cy, R * 0.93, 0, Math.PI * 2); ctx.stroke();
-    const seg = needle(t);
-    const ang = Math.atan2(seg[3] - seg[1], seg[2] - seg[0]);
-    // 針（無向）指向的地支對：取最接近的那一對
-    let deg = ((ang * 180 / Math.PI) % 180 + 180) % 180;
-    let best = 0, bestD = 1e9;
-    for (let b = 0; b < 6; b++) {
-      const a = ((270 - 30 * b) % 180 + 180) % 180;
-      const d = Math.min(Math.abs(a - deg), 180 - Math.abs(a - deg));
-      if (d < bestD) { bestD = d; best = b; }
+    for (let i = 0; i < N; i++) {
+      // 每根針延遲不同，變形時像水流一樣依序抵達
+      const delay = (seed[i] * 0.45 + (i / N) * 0.15);
+      const e = ease(Math.min(1, Math.max(0, (blend - delay) / (1 - 0.6))));
+      const swirl = Math.sin(Math.PI * e) * (0.5 + seed[i]) * 0.9;
+      const g0 = (i0 === 2 && zEdgeOf[i] >= 0) ? zTrineGain[zEdgeOf[i]] : 1;
+      const g1 = (i1 === 2 && zEdgeOf[i] >= 0) ? zTrineGain[zEdgeOf[i]] : 1;
+      for (let v = 0; v < 2; v++) {
+        const o = i * 6 + v * 3;
+        rotS(S0, a0, A, o); rotS(S1, a1, B, o);
+        let x = A[0] + (B[0] - A[0]) * e, y = A[1] + (B[1] - A[1]) * e, z = A[2] + (B[2] - A[2]) * e;
+        const cs = Math.cos(swirl), sn = Math.sin(swirl);
+        pos[o] = x * cs - z * sn; pos[o + 1] = y; pos[o + 2] = x * sn + z * cs;
+        const gg = g0 + (g1 - g0) * e;
+        col[o] = (S0.c[o] + (S1.c[o] - S0.c[o]) * e) * gg;
+        col[o + 1] = (S0.c[o + 1] + (S1.c[o + 1] - S0.c[o + 1]) * e) * gg;
+        col[o + 2] = (S0.c[o + 2] + (S1.c[o + 2] - S0.c[o + 2]) * e) * gg;
+      }
     }
-    ctx.font = `${Math.max(11, R * 0.075)}px ${css('--font-display')}`;
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    for (let b = 0; b < 12; b++) {
-      const a = branchAngle(b), on = b === best || b === best + 6;
-      const x = cx + Math.cos(a) * R * 0.93, y = cy - Math.sin(a) * R * 0.93;
-      ctx.fillStyle = css('--ink'); ctx.beginPath(); ctx.arc(x, y, R * 0.07, 0, Math.PI * 2); ctx.fill();
-      ctx.strokeStyle = on ? gold : line; ctx.stroke();
-      ctx.fillStyle = on ? gold : muted; ctx.fillText(BRANCH[b], x, y + 1);
-    }
+    geo.attributes.position.needsUpdate = true; geo.attributes.aColor.needsUpdate = true;
 
-    // 三尖瓣線
-    ctx.beginPath();
-    unit.forEach(([x, y], i) => { const X = cx + x * s, Y = cy - y * s; i ? ctx.lineTo(X, Y) : ctx.moveTo(X, Y); });
-    ctx.closePath(); ctx.strokeStyle = muted; ctx.globalAlpha = .45; ctx.stroke(); ctx.globalAlpha = 1;
+    // 甲子節點與標籤只在第 1 段出現
+    const wT = i0 === 1 ? 1 - ease(blend) : i1 === 1 ? ease(blend) : 0;
+    const wZ = i0 === 2 ? 1 - ease(blend) : i1 === 2 ? ease(blend) : 0;
+    const p3 = [0, 0, 0];
+    for (let n = 0; n < 60; n++) { const q = knot(n); rotY(q, phase * T.spin, T.tilt, p3, 0); p3[0] += T.dx; kn.set(p3, n * 3); }
+    kg.attributes.position.needsUpdate = true;
+    nodeMat.uniforms.uA.value = wT; nodeMat.uniforms.uT.value = now / 1000;
+    starMat.uniforms.uT.value = now / 1000;
+    lineMat.uniforms.uGain.value = 1 - Math.min(0.55, Math.max(0, fSmooth - 2.3) * 0.7);
+    bloom.strength = 0.95 - Math.min(0.45, Math.max(0, fSmooth - 2.4) * 0.45);
 
-    // 掃過的軌跡
-    trail.push(seg); if (trail.length > 140) trail.shift();
-    for (let i = 0; i < trail.length; i++) {
-      const [x1, y1, x2, y2] = trail[i];
-      ctx.globalAlpha = (i / trail.length) * 0.22;
-      ctx.strokeStyle = gold; ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.moveTo(cx + x1 * s, cy - y1 * s); ctx.lineTo(cx + x2 * s, cy - y2 * s); ctx.stroke();
-    }
-    ctx.globalAlpha = 1;
-    // 針本體
-    const [x1, y1, x2, y2] = seg;
-    ctx.shadowColor = gold; ctx.shadowBlur = 12;
-    ctx.strokeStyle = gold; ctx.lineWidth = 2.2; ctx.lineCap = 'round';
-    ctx.beginPath(); ctx.moveTo(cx + x1 * s, cy - y1 * s); ctx.lineTo(cx + x2 * s, cy - y2 * s); ctx.stroke();
-    ctx.shadowBlur = 0;
-    ctx.fillStyle = fg;
-    [[x1, y1], [x2, y2]].forEach(([x, y]) => { ctx.beginPath(); ctx.arc(cx + x * s, cy - y * s, 3, 0, Math.PI * 2); ctx.fill(); });
+    camera.position.x = pmx * 0.6; camera.position.y = -pmy * 0.4; camera.lookAt(0, 0, 0);
+    stars.rotation.y = phase * 0.15;
+    composer.render();
 
-    if (best !== lastPair) {
-      lastPair = best;
-      dirEl.textContent = `${BRANCH[best]} ⟷ ${BRANCH[best + 6]}`;
-      palEl.textContent = `${pname(best)} ⟷ ${pname(best + 6)}`;
+    // 標籤層（2D）：投影 3D 座標到螢幕
+    lctx.clearRect(0, 0, innerWidth, innerHeight);
+    lctx.textAlign = 'center'; lctx.textBaseline = 'middle';
+    if (wT > 0.02) {
+      for (let n = 0; n < 60; n++) {
+        const hi = PILLARS.find(p => p.n === n);
+        if (!hi && (small || n % 5)) continue;
+        proj.set(kn[n * 3], kn[n * 3 + 1], kn[n * 3 + 2]).project(camera);
+        const x = (proj.x + 1) / 2 * innerWidth, y = (1 - proj.y) / 2 * innerHeight;
+        lctx.globalAlpha = wT * (hi ? 1 : 0.45);
+        lctx.font = `${hi ? 15 : 11}px ${getComputedStyle(document.body).getPropertyValue('--font-display') || 'serif'}`;
+        lctx.fillStyle = hi ? '#ffeec4' : '#9ba1b4';
+        lctx.fillText(STEM[n % 10] + BRANCH[n % 12], x, y - (hi ? 18 : 10));
+        if (hi) { lctx.font = '10px "IBM Plex Mono", monospace'; lctx.fillStyle = '#e6c47c'; lctx.fillText(`${hi.label} · ${n + 1}`, x, y + 16); }
+      }
     }
-    angEl.textContent = deg.toFixed(1) + '°';
-    if (!reduceMotion) requestAnimationFrame(frame);
+    if (wZ > 0.02) {
+      lctx.font = `18px "LXGW WenKai TC", serif`;
+      for (let b = 0; b < 12; b++) {
+        const v = vert(b); proj.set(v[0] * 1.13 + Z.dx, v[1] * 1.13, 0).project(camera);
+        const x = (proj.x + 1) / 2 * innerWidth, y = (1 - proj.y) / 2 * innerHeight;
+        const set = TRINE_SETS.findIndex(s => s.includes(b));
+        const on = trineFocus < 0 || trineFocus === set;
+        lctx.globalAlpha = wZ * (on ? 1 : 0.3);
+        lctx.fillStyle = trineFocus === set ? TRINE_COLORS[set] : '#e9e2d0';
+        lctx.fillText(BRANCH[b], x, y);
+        lctx.font = '10px "IBM Plex Mono", monospace'; lctx.fillStyle = '#7d8397';
+        lctx.fillText(String(b), x, y + 16);
+        lctx.font = `18px "LXGW WenKai TC", serif`;
+      }
+      TRINE_SETS.forEach((set, k) => {
+        // 三合的中間那一支（子酉午卯）正是四正位，局名標在它內側
+        const c = vert(set[1]);
+        proj.set(c[0] * 0.74 + Z.dx, c[1] * 0.74, 0).project(camera);
+        lctx.globalAlpha = wZ * zTrineGain[k] * 0.9; lctx.fillStyle = TRINE_COLORS[k];
+        lctx.font = `14px "LXGW WenKai TC", serif`;
+        lctx.fillText(TRINE_NAMES[k] + '局', (proj.x + 1) / 2 * innerWidth, (1 - proj.y) / 2 * innerHeight);
+      });
+    }
+    lctx.globalAlpha = 1;
+
+    const active = Math.round(f);
+    navLinks.forEach((a, k) => a.classList.toggle('on', k === Math.min(4, active)));
+    requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
-  if (reduceMotion) addEventListener('resize', () => requestAnimationFrame(frame));
 })();
 
-/* ───────── 命盤 ───────── */
+/* 三合圖例 */
+document.querySelectorAll('#legend button').forEach(btn => {
+  btn.setAttribute('aria-pressed', 'false');
+  btn.addEventListener('click', () => {
+    const k = +btn.dataset.set;
+    trineFocus = trineFocus === k ? -1 : k;
+    document.querySelectorAll('#legend button').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.set === trineFocus)));
+  });
+});
+/* 四柱卡 */
+document.getElementById('pillars').innerHTML = PILLARS.map(p => `<div class="pillar"><small>${p.label}</small><b>${p.gz}</b><span>第 ${p.n + 1} / 60</span></div>`).join('');
+
+/* 玻璃面板的游標光斑 */
+document.querySelectorAll('.glass').forEach(el => el.addEventListener('pointermove', e => {
+  const r = el.getBoundingClientRect();
+  el.style.setProperty('--mx', `${e.clientX - r.left}px`); el.style.setProperty('--my', `${e.clientY - r.top}px`);
+}));
+
+/* ───────────────── 命盤 ───────────────── */
 const board = document.getElementById('board');
 const center = document.getElementById('center');
 const detail = document.getElementById('detail');
 const timeline = document.getElementById('timeline');
-// 方盤位置：巳午未申 / 辰  酉 / 卯  戌 / 寅丑子亥
 const POS = { 5: [1, 1], 6: [1, 2], 7: [1, 3], 8: [1, 4], 4: [2, 1], 9: [2, 4], 3: [3, 1], 10: [3, 4], 2: [4, 1], 1: [4, 2], 0: [4, 3], 11: [4, 4] };
 const trineOf = b => [b, (b + 6) % 12, (b + 4) % 12, (b + 8) % 12];
-let selected = CHART.ming;
-let dxIndex = CHART.curDx;
+let selected = CHART.ming, dxIndex = CHART.curDx;
 const cells = {};
-
 const huaTag = h => h ? `<span class="hua ${h}">${h}</span>` : '';
 for (let b = 0; b < 12; b++) {
   const p = byBranch[b];
@@ -429,7 +705,7 @@ for (let b = 0; b < 12; b++) {
   el.type = 'button'; el.className = 'cell';
   el.style.gridRow = POS[b][0]; el.style.gridColumn = POS[b][1];
   const majors = p.stars.filter(s => s.t === 'major');
-  const others = p.stars.filter(s => s.t !== 'major').map(s => s.n + (s.h ? `<span class="hua ${s.h}">${s.h}</span>` : '')).join(' ');
+  const others = p.stars.filter(s => s.t !== 'major').map(s => s.n + (s.h ? huaTag(s.h) : '')).join(' ');
   el.innerHTML = `
     <div class="majors">${majors.length ? majors.map(s => `<span>${s.n}<span class="br">${s.br}</span>${huaTag(s.h)}</span>`).join('') : `<span class="borrow">空宮${p.borrow ? '・借' + p.borrow.join('') : ''}</span>`}</div>
     <div class="minors">${others}</div>
@@ -441,10 +717,8 @@ for (let b = 0; b < 12; b++) {
 }
 const L = CHART.lunar;
 center.innerHTML = `
-  <div class="who">範例命盤</div>
-  <div class="facts">${CHART.yy}・${CHART.ju}<br>農曆 ${L.lunarYear} 年 ${L.lunarMonth} 月 ${L.lunarDay} 日 午時<br>四柱 ${L.fourPillars.join(' ')}<br>命主 ${CHART.mingZhu}・身主 ${CHART.shenZhu}</div>
+  <div><div class="who">範例命盤</div><div class="facts">${CHART.yy}・${CHART.ju}・命主 ${CHART.mingZhu}・身主 ${CHART.shenZhu}<br>農曆 ${L.lunarYear} 年 ${L.lunarMonth} 月 ${L.lunarDay} 日 午時・${L.fourPillars.join(' ')}</div></div>
   <div class="dir" id="center-dir"></div>`;
-
 CHART.daXians.forEach((d, i) => {
   const el = document.createElement('button');
   el.type = 'button'; el.className = 'dx' + (i === CHART.curDx ? ' now' : '');
@@ -461,22 +735,19 @@ function select(b) {
     cells[k].classList.toggle('trine', k !== b && tri.includes(k));
     cells[k].querySelector('.dx-now')?.remove();
   }
-  const dxB = CHART.daXians[dxIndex].b;
-  const dot = document.createElement('span'); dot.className = 'dx-now'; cells[dxB].appendChild(dot);
+  const dot = document.createElement('span'); dot.className = 'dx-now'; cells[CHART.daXians[dxIndex].b].appendChild(dot);
   [...timeline.children].forEach((el, i) => el.setAttribute('aria-pressed', String(i === dxIndex)));
   renderDetail(b);
-  targetAngle = branchAngle(b);
+  // 三尖瓣線參數 t 的針方向是 -t/2；要指向 b 的軸線，t 取 -2·角度（模 2π）
+  targetT = ((-2 * branchAngle(b)) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
   document.getElementById('center-dir').textContent = `針 → ${pname(b)} ⟷ ${pname((b + 6) % 12)}`;
-  kick();
 }
-
 function renderDetail(b) {
   const p = byBranch[b];
   const grp = (title, list, cls) => list.length ? `<div class="group"><span>${title}</span><div class="chips">${list.map(s => `<span class="chip ${cls}">${s.n}${s.br ? `<small>${s.br}</small>` : ''}${huaTag(s.h)}</span>`).join('')}</div></div>` : '';
-  const tri = trineOf(b);
-  const role = ['本宮', '對宮', '三合', '三合'];
+  const tri = trineOf(b), role = ['本宮', '對宮 x+6', '三合 x+4', '三合 x+8'];
   detail.innerHTML = `
-    <h3>${pname(b)}<span class="mono">${STEM[p.s]}${BRANCH[b]}${p.dx ? ` · 大限 ${p.dx[0]}–${p.dx[1]} 歲` : ''}</span></h3>
+    <h3>${pname(b)}<span class="mono">${STEM[p.s]}${BRANCH[b]} · ℤ/12 中的 ${b}${p.dx ? ` · 大限 ${p.dx[0]}–${p.dx[1]} 歲` : ''}</span></h3>
     ${grp('主星', p.stars.filter(s => s.t === 'major'), 'major') || `<div class="group"><span>主星</span><p class="note">空宮，借對宮 ${p.borrow ? p.borrow.join('、') : ''} 來看。</p></div>`}
     ${grp('吉星', p.stars.filter(s => s.t === 'lucky'), '')}
     ${grp('煞星', p.stars.filter(s => s.t === 'sha'), 'sha')}
@@ -488,131 +759,130 @@ function renderDetail(b) {
     ${b === CHART.ming ? `<div class="group"><span>格局（引擎判定）</span><div class="patterns">${CHART.patterns.map(x => `<span class="pat ${x.level === 'excellent' ? '' : 'good'}">${x.name}</span>`).join('')}</div></div>` : ''}`;
 }
 
-/* 盤面上的針：本宮與對宮連成一根長針，兩個三合宮是細針；選宮時長針轉過去 */
+/* 盤心：三尖瓣線裡的掛谷針，轉向選中的「本宮 ⟷ 對宮」軸線；兩端射出光束照亮宮位 */
 const ncv = document.getElementById('needles');
-let curAngle = branchAngle(CHART.ming), targetAngle = curAngle, running = false, phase = 0;
-function cellCenter(b, w, h) {
-  const [r, c] = POS[b];
-  return [(c - 0.5) / 4 * w, (r - 0.5) / 4 * h];
-}
-function drawNeedles() {
-  const { ctx, w, h } = fitCanvas(ncv);
-  const gold = css('--needle'), line = css('--line');
-  ctx.clearRect(0, 0, w, h);
-  const cx = w / 2, cy = h / 2, R = Math.hypot(w, h) * 0.37;
-  // 十二個方向的底線
-  ctx.strokeStyle = line; ctx.lineWidth = 1;
-  for (let b = 0; b < 12; b++) {
-    const [x, y] = cellCenter(b, w, h);
-    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(x, y); ctx.stroke();
+const DN = 600, unit = [];
+for (let i = 0; i < DN; i++) { const t = i / DN * 2 * Math.PI; unit.push([2 * Math.cos(t) + Math.cos(2 * t), 2 * Math.sin(t) - Math.sin(2 * t)]); }
+function needleAt(t) {
+  const px = 2 * Math.cos(t) + Math.cos(2 * t), py = 2 * Math.sin(t) - Math.sin(2 * t);
+  const dx = Math.cos(-t / 2), dy = Math.sin(-t / 2);
+  let lo = 0, hi = 0;
+  for (let i = 0; i < DN; i++) {
+    const [ax, ay] = unit[i], [bx, by] = unit[(i + 1) % DN];
+    const ex = bx - ax, ey = by - ay, den = dx * ey - dy * ex;
+    if (Math.abs(den) < 1e-12) continue;
+    const qx = ax - px, qy = ay - py, lam = (qx * ey - qy * ex) / den, mu = (qx * dy - qy * dx) / den;
+    if (mu >= 0 && mu <= 1) { if (lam < lo) lo = lam; if (lam > hi) hi = lam; }
   }
-  // 三合細針
-  const tri = trineOf(selected);
-  ctx.strokeStyle = gold; ctx.globalAlpha = .55; ctx.lineWidth = 1;
-  ctx.setLineDash([3, 4]);
-  ctx.beginPath();
-  [tri[0], tri[2], tri[3]].forEach((b, i) => { const [x, y] = cellCenter(b, w, h); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
-  ctx.closePath(); ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1;
-  // 旋轉中的長針（無向，貫穿本宮與對宮）
-  let d = targetAngle - curAngle;
-  d = Math.atan2(Math.sin(d), Math.cos(d));
-  if (Math.abs(d) > Math.PI / 2) d += d > 0 ? -Math.PI : Math.PI; // 針沒有頭尾，轉最短的那一邊
-  curAngle += reduceMotion ? d : d * 0.08;
-  const ux = Math.cos(curAngle), uy = -Math.sin(curAngle);
-  // 掃過的扇形殘影
-  ctx.fillStyle = css('--needle-soft');
-  ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, R, -curAngle - 0.04, -curAngle + 0.04); ctx.closePath(); ctx.fill();
-  ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, R, Math.PI - curAngle - 0.04, Math.PI - curAngle + 0.04); ctx.closePath(); ctx.fill();
-  ctx.shadowColor = gold; ctx.shadowBlur = 10; ctx.strokeStyle = gold; ctx.lineWidth = 2; ctx.lineCap = 'round';
-  ctx.beginPath(); ctx.moveTo(cx - ux * R, cy - uy * R); ctx.lineTo(cx + ux * R, cy + uy * R); ctx.stroke();
-  ctx.shadowBlur = 0;
-  // 針上流動的光點
-  phase = (phase + (reduceMotion ? 0 : 0.006)) % 1;
-  const f = phase * 2 - 1;
-  ctx.fillStyle = gold; ctx.beginPath(); ctx.arc(cx + ux * R * f, cy + uy * R * f, 2.5, 0, Math.PI * 2); ctx.fill();
-  return Math.abs(d) > 0.001;
+  return { a: [px + dx * lo, py + dy * lo], b: [px + dx * hi, py + dy * hi], tan: [px, py], dir: [dx, dy] };
 }
-function loop() { const moving = drawNeedles(); if (moving || !reduceMotion) requestAnimationFrame(loop); else running = false; }
-function kick() { if (!running) { running = true; requestAnimationFrame(loop); } }
-addEventListener('resize', kick);
+let curT = 0, targetT = 0;
+const trail = [];
+function fit(cv) {
+  const r = cv.getBoundingClientRect(), dpr = Math.min(devicePixelRatio || 1, 2);
+  const w = Math.max(1, Math.round(r.width * dpr)), h = Math.max(1, Math.round(r.height * dpr));
+  if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
+  const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); return { ctx, w: r.width, h: r.height };
+}
+function cellCenter(b, w, h) { const [r, c] = POS[b]; return [(c - 0.5) / 4 * w, (r - 0.5) / 4 * h]; }
+function drawBoard(now) {
+  const { ctx, w, h } = fit(ncv);
+  ctx.clearRect(0, 0, w, h);
+  let d = targetT - curT; d = Math.atan2(Math.sin(d), Math.cos(d));
+  curT += reduceMotion ? d : d * 0.06;
+  const cx = w / 2, cy = h / 2, s = Math.min(w, h) * 0.205 / 3;     // 三尖瓣線外接半徑 3s，留在盤心兩格內
+  const N0 = needleAt(curT);
+  const X = p => cx + p[0] * s, Y = p => cy - p[1] * s;
+  // 光束：針的方向延伸到盤緣，照亮兩端的宮
+  const ang = Math.atan2(N0.dir[1], N0.dir[0]);
+  const R = Math.hypot(w, h) * 0.55;
+  ctx.globalCompositeOperation = 'lighter';
+  for (const sgn of [1, -1]) {
+    const g = ctx.createLinearGradient(cx, cy, cx + Math.cos(ang) * R * sgn, cy - Math.sin(ang) * R * sgn);
+    g.addColorStop(0, 'rgba(230,196,124,0.0)'); g.addColorStop(0.35, 'rgba(230,196,124,0.10)'); g.addColorStop(1, 'rgba(230,196,124,0.0)');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, R, -ang - (sgn < 0 ? Math.PI : 0) - 0.09, -ang - (sgn < 0 ? Math.PI : 0) + 0.09); ctx.closePath(); ctx.fill();
+  }
+  // 三合三角形（細虛線）
+  const tri = trineOf(selected);
+  ctx.setLineDash([2, 5]); ctx.strokeStyle = 'rgba(230,196,124,0.55)'; ctx.lineWidth = 1;
+  ctx.beginPath(); [tri[0], tri[2], tri[3]].forEach((b, i) => { const [x, y] = cellCenter(b, w, h); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }); ctx.closePath(); ctx.stroke(); ctx.setLineDash([]);
+  // 三尖瓣線
+  ctx.beginPath(); unit.forEach((p, i) => i ? ctx.lineTo(X(p), Y(p)) : ctx.moveTo(X(p), Y(p))); ctx.closePath();
+  ctx.strokeStyle = 'rgba(142,174,230,0.35)'; ctx.lineWidth = 1; ctx.stroke();
+  // 殘影
+  trail.push(N0); if (trail.length > 70) trail.shift();
+  trail.forEach((n, i) => { ctx.strokeStyle = `rgba(230,196,124,${(i / trail.length) * 0.16})`; ctx.beginPath(); ctx.moveTo(X(n.a), Y(n.a)); ctx.lineTo(X(n.b), Y(n.b)); ctx.stroke(); });
+  // 針
+  ctx.shadowColor = '#e6c47c'; ctx.shadowBlur = 16; ctx.strokeStyle = '#f3d998'; ctx.lineWidth = 2.2; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(X(N0.a), Y(N0.a)); ctx.lineTo(X(N0.b), Y(N0.b)); ctx.stroke(); ctx.shadowBlur = 0;
+  ctx.fillStyle = '#fff4d6'; [N0.a, N0.b].forEach(p => { ctx.beginPath(); ctx.arc(X(p), Y(p), 2.6, 0, Math.PI * 2); ctx.fill(); });
+  ctx.fillStyle = 'rgba(142,174,230,0.9)'; ctx.beginPath(); ctx.arc(X(N0.tan), Y(N0.tan), 2, 0, Math.PI * 2); ctx.fill();
+  ctx.globalCompositeOperation = 'source-over';
+  // 宮位受光：方向越接近針軸越亮
+  for (let b = 0; b < 12; b++) {
+    const [x, y] = cellCenter(b, w, h); const ca = Math.atan2(cy - y, x - cx);
+    const lit = Math.pow(Math.abs(Math.cos(ca - ang)), 18);
+    cells[b].style.setProperty('--lit', lit.toFixed(3));
+  }
+  requestAnimationFrame(drawBoard);
+}
 select(CHART.ming);
+curT = targetT;
+requestAnimationFrame(drawBoard);
 
-/* ───────── Perron 樹 ───────── */
+/* ───────────────── Perron 樹 ───────────────── */
 (() => {
   const cv = document.getElementById('tree'), slider = document.getElementById('squeeze'), areaEl = document.getElementById('area');
   const LEVELS = 7, NT = 1 << LEVELS;
   const off = document.createElement('canvas'); off.width = 240; off.height = 180;
   const octx = off.getContext('2d', { willReadFrequently: true });
   let base = null;
-  // 每根細針的水平位移：第 k 層二進位位為 1 的針往左移，越深的層移得越多，交疊後長出「樹枝」
   function shifts(alpha) {
     const s = [];
-    for (let i = 0; i < NT; i++) {
-      let v = 0;
-      for (let k = 1; k <= LEVELS; k++) if ((i >> (LEVELS - k)) & 1) v -= (1 - alpha) * Math.pow(2, -k) * (k / LEVELS);
-      s.push(v);
-    }
+    for (let i = 0; i < NT; i++) { let v = 0; for (let k = 1; k <= LEVELS; k++) if ((i >> (LEVELS - k)) & 1) v -= (1 - alpha) * Math.pow(2, -k) * (k / LEVELS); s.push(v); }
     return s;
   }
-  // 回傳每根針的三角形（底左、底右、針尖），整體水平置中、寬度依原三角形縮放
   function tris(alpha, W, H, pad) {
-    const sh = shifts(alpha), raw = [];
-    let lo = Infinity, hi = -Infinity;
-    for (let i = 0; i < NT; i++) {
-      const b0 = i / NT + sh[i], b1 = b0 + 1 / NT, a = 0.5 + sh[i];
-      raw.push([b0, b1, a]);
-      lo = Math.min(lo, b0, a); hi = Math.max(hi, b1, a);
-    }
-    const scale = (W - pad * 2) * 0.7, mid = (lo + hi) / 2;
-    const X = u => W / 2 + (u - mid) * scale;
+    const sh = shifts(alpha), raw = []; let lo = Infinity, hi = -Infinity;
+    for (let i = 0; i < NT; i++) { const b0 = i / NT + sh[i], b1 = b0 + 1 / NT, a = 0.5 + sh[i]; raw.push([b0, b1, a]); lo = Math.min(lo, b0, a); hi = Math.max(hi, b1, a); }
+    const scale = (W - pad * 2) * 0.7, mid = (lo + hi) / 2, X = u => W / 2 + (u - mid) * scale;
     return raw.map(([b0, b1, a]) => [X(b0), H - pad, X(b1), H - pad, X(a), pad]);
   }
-  function spread(W, H, pad) {
-    const half = (W - pad * 2) * 0.7 / 2;
-    return 2 * Math.atan(half / (H - pad * 2)) * 180 / Math.PI;
-  }
+  const spread = (W, H, pad) => 2 * Math.atan((W - pad * 2) * 0.35 / (H - pad * 2)) * 180 / Math.PI;
   function measure(alpha) {
     octx.clearRect(0, 0, off.width, off.height); octx.fillStyle = '#000';
     tris(alpha, off.width, off.height, 10).forEach(([a, b, c, d, e, f]) => { octx.beginPath(); octx.moveTo(a, b); octx.lineTo(c, d); octx.lineTo(e, f); octx.closePath(); octx.fill(); });
-    const px = octx.getImageData(0, 0, off.width, off.height).data;
-    let n = 0; for (let i = 3; i < px.length; i += 4) if (px[i] > 127) n++;
-    return n;
+    const px = octx.getImageData(0, 0, off.width, off.height).data; let n = 0; for (let i = 3; i < px.length; i += 4) if (px[i] > 127) n++; return n;
   }
   function draw() {
     const alpha = 1 - slider.value / 100;
-    const { ctx, w, h } = fitCanvas(cv);
+    const { ctx, w, h } = fit(cv);
     ctx.clearRect(0, 0, w, h);
-    const gold = css('--needle');
-    ctx.fillStyle = gold; ctx.globalAlpha = 0.16; ctx.strokeStyle = gold; ctx.lineWidth = 0.5;
-    tris(alpha, w, h, 20).forEach(([a, b, c, d, e, f]) => {
-      ctx.beginPath(); ctx.moveTo(a, b); ctx.lineTo(c, d); ctx.lineTo(e, f); ctx.closePath(); ctx.fill();
+    ctx.globalCompositeOperation = 'lighter';
+    const T = tris(alpha, w, h, 22);
+    T.forEach(([a, b, c, d, e, f], i) => {
+      const g = ctx.createLinearGradient(0, b, 0, f); g.addColorStop(0, 'rgba(230,196,124,0.10)'); g.addColorStop(1, 'rgba(142,174,230,0.05)');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(a, b); ctx.lineTo(c, d); ctx.lineTo(e, f); ctx.closePath(); ctx.fill();
     });
-    ctx.globalAlpha = 0.55;
-    tris(alpha, w, h, 20).forEach(([a, b, c, d, e, f]) => { ctx.beginPath(); ctx.moveTo((a + c) / 2, b); ctx.lineTo(e, f); ctx.stroke(); });
-    ctx.globalAlpha = 1;
-    document.getElementById('spread').textContent = spread(w, h, 20).toFixed(1) + '°';
+    ctx.lineWidth = 0.6; ctx.strokeStyle = 'rgba(243,217,152,0.55)';
+    T.forEach(([a, b, c, d, e, f]) => { ctx.beginPath(); ctx.moveTo((a + c) / 2, b); ctx.lineTo(e, f); ctx.stroke(); });
+    ctx.globalCompositeOperation = 'source-over';
+    document.getElementById('spread').textContent = spread(w, h, 22).toFixed(1) + '°';
     if (base === null) base = measure(1);
     areaEl.textContent = (measure(alpha) / base * 100).toFixed(1);
   }
-  slider.addEventListener('input', draw);
-  addEventListener('resize', draw);
-  draw();
-  // 進場時自動擠一次，示範面積變小
+  slider.addEventListener('input', draw); addEventListener('resize', draw); draw();
   if (!reduceMotion) {
-    let v = 0;
-    const go = () => { v += 0.6; slider.value = String(Math.min(v, 55)); draw(); if (v < 55) requestAnimationFrame(go); };
-    setTimeout(() => requestAnimationFrame(go), 900);
+    let started = false;
+    new IntersectionObserver(es => es.forEach(e => {
+      if (e.isIntersecting && !started) { started = true; let v = 0; const go = () => { v += 0.7; slider.value = String(Math.min(v, 55)); draw(); if (v < 55) requestAnimationFrame(go); }; requestAnimationFrame(go); }
+    }), { threshold: 0.4 }).observe(cv);
   }
 })();
 
-/* 原型：問題按鈕只切換選取狀態；表單不送出 */
-document.querySelectorAll('.ask').forEach(b => b.addEventListener('click', () => {
-  document.querySelectorAll('.ask').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
-}));
-document.getElementById('birth').addEventListener('submit', e => {
-  e.preventDefault();
-  document.getElementById('form-note').textContent = '原型只展示範例命盤；正式版按下「排盤」會用你填的資料即時起盤。';
-});
+document.querySelectorAll('.ask').forEach(b => b.addEventListener('click', () => document.querySelectorAll('.ask').forEach(x => x.setAttribute('aria-pressed', String(x === b)))));
+document.getElementById('birth').addEventListener('submit', e => { e.preventDefault(); document.getElementById('form-note').textContent = '原型只展示範例命盤；正式版按下「排盤」會用你填的資料即時起盤。'; });
 </script>
 
 </html>
