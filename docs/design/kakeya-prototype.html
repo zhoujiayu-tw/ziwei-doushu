@@ -1,0 +1,618 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>掛谷紫微</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@300;400;700&family=Noto+Sans+TC:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* 版面：漆黑夜空上的金線。一根「掛谷針」貫穿全頁：首屏轉遍十二方向，命盤裡指向三方四正，最後一節把方向擠進最小面積 */
+:root {
+  --ink: #0e1119;          /* 底：靛黑漆面 */
+  --ink-2: #151a26;        /* 次層面板 */
+  --line: #262d3d;         /* 分隔線 */
+  --fg: #e9e4d8;           /* 正文：米白 */
+  --muted: #9a9fae;        /* 次要文字 */
+  --needle: #d9b66b;       /* 針：金箔 */
+  --needle-soft: rgba(217, 182, 107, .16);
+  --lu: #7db89b;           /* 化祿 玉綠 */
+  --quan: #d9b66b;         /* 化權 金 */
+  --ke: #8fa9d9;           /* 化科 青 */
+  --ji: #d46f55;           /* 化忌 朱 */
+  --cell: rgba(21, 26, 38, .78);
+  --font-display: "LXGW WenKai TC", "Kaiti TC", "BiauKai", serif;
+  --font-body: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
+  --step--1: .8125rem; --step-0: 1rem; --step-1: 1.25rem; --step-2: 1.75rem; --step-3: clamp(2.25rem, 6vw, 3.75rem);
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --ink: #eef0f3; --ink-2: #e3e7ed; --line: #c9cfda; --fg: #1a2131; --muted: #5d6578;
+    --needle: #9a6a1c; --needle-soft: rgba(154, 106, 28, .14);
+    --lu: #2f7d5a; --quan: #9a6a1c; --ke: #3a5ea8; --ji: #b2452c;
+    --cell: rgba(238, 240, 243, .82); color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --ink: #eef0f3; --ink-2: #e3e7ed; --line: #c9cfda; --fg: #1a2131; --muted: #5d6578;
+  --needle: #9a6a1c; --needle-soft: rgba(154, 106, 28, .14);
+  --lu: #2f7d5a; --quan: #9a6a1c; --ke: #3a5ea8; --ji: #b2452c;
+  --cell: rgba(238, 240, 243, .82); color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--ink); color: var(--fg);
+  font-family: var(--font-body); font-size: var(--step-0); line-height: 1.7;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 1120px; margin: 0 auto; }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 400; text-wrap: balance; margin: 0; letter-spacing: .02em; }
+p { margin: 0; }
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.eyebrow { font-family: var(--font-mono); font-size: .75rem; letter-spacing: .14em; text-transform: uppercase; color: var(--needle); }
+
+/* 頂欄 */
+header.top { display: flex; align-items: center; justify-content: space-between; gap: 8px 16px; flex-wrap: wrap; padding-block: 20px; border-bottom: 1px solid var(--line); }
+.brand { display: flex; align-items: baseline; gap: 10px; }
+.brand b { font-family: var(--font-display); font-size: var(--step-1); font-weight: 700; white-space: nowrap; }
+.brand span { font-family: var(--font-mono); font-size: .72rem; color: var(--muted); }
+nav.main { display: flex; gap: 4px; flex-wrap: wrap; }
+nav.main a { color: var(--muted); text-decoration: none; font-size: var(--step--1); padding: 4px 10px; border-radius: 999px; }
+nav.main a[aria-current] { color: var(--fg); background: var(--needle-soft); }
+nav.main a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--needle); outline-offset: 2px; }
+
+/* 首屏 */
+.hero { display: grid; grid-template-columns: 1.05fr 1fr; gap: 40px; align-items: center; padding-block: 48px 32px; }
+.hero-copy { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+.hero h1 { font-size: var(--step-3); line-height: 1.15; }
+.hero h1 em { font-style: normal; color: var(--needle); }
+.hero .lede { color: var(--muted); max-width: 34em; }
+.readout { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; font-size: var(--step--1); border-top: 1px solid var(--line); padding-top: 16px; max-width: 30em; }
+.readout dt { color: var(--muted); font-family: var(--font-mono); font-size: .75rem; letter-spacing: .08em; padding-top: 2px; }
+.readout dd { margin: 0; }
+.readout dd strong { font-family: var(--font-display); font-weight: 700; font-size: var(--step-1); color: var(--needle); }
+.stage { position: relative; aspect-ratio: 1; width: 100%; max-width: 520px; justify-self: center; }
+.stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+/* 區段 */
+section.block { padding-block: 40px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 24px; }
+.block-head { display: flex; justify-content: space-between; align-items: end; gap: 16px; flex-wrap: wrap; }
+.block-head h2 { font-size: var(--step-2); }
+.note { font-size: var(--step--1); color: var(--muted); }
+.sample-tag { font-family: var(--font-mono); font-size: .7rem; letter-spacing: .1em; color: var(--muted); border: 1px dashed var(--line); padding: 2px 8px; border-radius: 4px; white-space: nowrap; }
+
+/* 出生資料 */
+form.birth { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; align-items: end; }
+.field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.field label { font-size: .75rem; color: var(--muted); }
+.field input, .field select { font: inherit; font-size: var(--step--1); color: var(--fg); background: var(--ink-2); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; width: 100%; }
+.btn { font: inherit; font-size: var(--step--1); border: 1px solid var(--needle); background: transparent; color: var(--needle); padding: 8px 16px; border-radius: 6px; cursor: pointer; }
+.btn:hover { background: var(--needle-soft); }
+.btn.solid { background: var(--needle); color: var(--ink); }
+
+/* 命盤 */
+.chart-layout { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+.board { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(4, minmax(0, 1fr)); gap: 4px; aspect-ratio: 1; width: 100%; max-width: 100%; }
+.board canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+.cell { position: relative; z-index: 1; background: var(--cell); border: 1px solid var(--line); border-radius: 4px; padding: 6px 7px; display: flex; flex-direction: column; gap: 2px; min-width: 0; overflow: hidden; cursor: pointer; text-align: left; font: inherit; color: inherit; backdrop-filter: blur(2px); }
+.cell:hover { border-color: var(--needle); }
+.cell[aria-pressed="true"] { border-color: var(--needle); box-shadow: inset 0 0 0 1px var(--needle); }
+.cell.trine { border-color: color-mix(in srgb, var(--needle) 55%, var(--line)); }
+.cell .majors { font-family: var(--font-display); font-size: clamp(.8rem, 1.7vw, 1.05rem); line-height: 1.3; display: flex; flex-wrap: wrap; gap: 0 6px; }
+.cell .majors .br { font-family: var(--font-body); font-size: .62rem; color: var(--muted); margin-left: 1px; }
+.cell .borrow { color: var(--muted); font-size: .7rem; }
+.cell .minors { font-size: .64rem; color: var(--muted); line-height: 1.35; }
+.cell .foot { margin-top: auto; display: flex; justify-content: space-between; align-items: end; gap: 4px; }
+.cell .pname { font-family: var(--font-display); font-size: .82rem; }
+.cell .pname.ming { color: var(--needle); }
+.cell .gz { font-family: var(--font-mono); font-size: .62rem; color: var(--muted); }
+.cell .age { font-family: var(--font-mono); font-size: .6rem; color: var(--muted); }
+.cell .dx-now { position: absolute; top: 5px; right: 6px; width: 6px; height: 6px; border-radius: 50%; background: var(--needle); }
+.hua { display: inline-block; font-family: var(--font-body); font-size: .6rem; line-height: 1; padding: 2px 3px; border-radius: 3px; color: var(--ink); vertical-align: 2px; margin-left: 2px; }
+.hua.祿 { background: var(--lu); } .hua.權 { background: var(--quan); } .hua.科 { background: var(--ke); } .hua.忌 { background: var(--ji); }
+.center { grid-column: 2 / 4; grid-row: 2 / 4; z-index: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px; text-align: center; pointer-events: none; padding: 8px; }
+.center > div { background: var(--cell); border-radius: 4px; padding: 0 6px; }
+.center .who { font-family: var(--font-display); font-size: clamp(1rem, 2.4vw, 1.4rem); }
+.center .facts { font-size: clamp(.62rem, 1.3vw, .78rem); color: var(--muted); line-height: 1.6; }
+.center .dir { font-family: var(--font-mono); font-size: clamp(.6rem, 1.2vw, .72rem); color: var(--needle); letter-spacing: .06em; }
+
+.timeline { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; }
+.dx { flex: 0 0 auto; font: inherit; font-size: .75rem; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 4px 10px; cursor: pointer; white-space: nowrap; }
+.dx .mono { font-size: .7rem; }
+.dx[aria-pressed="true"] { color: var(--ink); background: var(--needle); border-color: var(--needle); }
+.dx.now:not([aria-pressed="true"]) { border-color: var(--needle); color: var(--fg); }
+
+.detail { background: var(--ink-2); border: 1px solid var(--line); border-radius: 8px; padding: 20px; display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.detail h3 { font-size: var(--step-2); display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.detail h3 .mono { font-size: .8rem; color: var(--muted); }
+.group { display: flex; flex-direction: column; gap: 6px; }
+.group > span { font-family: var(--font-mono); font-size: .7rem; letter-spacing: .1em; color: var(--muted); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-size: var(--step--1); border: 1px solid var(--line); border-radius: 4px; padding: 2px 8px; }
+.chip.major { font-family: var(--font-display); font-size: var(--step-0); border-color: var(--needle); }
+.chip.sha { border-color: color-mix(in srgb, var(--ji) 45%, var(--line)); }
+.chip small { color: var(--muted); margin-left: 3px; font-size: .7rem; }
+.sfsz { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+.sfsz div { border-left: 2px solid var(--needle); padding: 2px 8px; font-size: var(--step--1); }
+.sfsz div b { font-family: var(--font-display); font-weight: 400; }
+.sfsz div span { color: var(--muted); display: block; font-size: .72rem; }
+.patterns { display: flex; flex-wrap: wrap; gap: 6px; }
+.pat { font-family: var(--font-display); border-radius: 999px; padding: 2px 12px; font-size: var(--step--1); border: 1px solid var(--needle); color: var(--needle); }
+.pat.good { border-color: var(--lu); color: var(--lu); }
+
+/* AI 解讀 */
+.ai { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 24px; }
+.asks { display: flex; flex-direction: column; gap: 8px; }
+.ask { font: inherit; font-size: var(--step--1); text-align: left; background: var(--ink-2); color: var(--fg); border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; cursor: pointer; }
+.ask:hover, .ask[aria-pressed="true"] { border-color: var(--needle); }
+.answer { background: var(--ink-2); border: 1px solid var(--line); border-radius: 8px; padding: 20px 24px; min-width: 0; display: flex; flex-direction: column; gap: 12px; max-width: 70ch; }
+.answer h4 { font-family: var(--font-display); font-weight: 700; font-size: var(--step-1); margin: 0; }
+.answer p { color: var(--fg); }
+.answer .meta { font-family: var(--font-mono); font-size: .7rem; color: var(--muted); display: flex; gap: 12px; flex-wrap: wrap; }
+.cursor { display: inline-block; width: .5em; height: 1em; background: var(--needle); vertical-align: -2px; animation: blink 1s steps(2) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+
+/* Perron 樹 */
+.perron { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; align-items: center; }
+.perron .stage2 { position: relative; aspect-ratio: 4 / 3; width: 100%; background: var(--ink-2); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.perron .stage2 canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.perron-copy { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.perron-copy p { color: var(--muted); max-width: 36em; }
+.meter { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.meter div { border-top: 1px solid var(--line); padding-top: 8px; }
+.meter span { display: block; font-size: .72rem; color: var(--muted); }
+.meter b { font-family: var(--font-mono); font-weight: 500; font-size: var(--step-1); color: var(--needle); }
+input[type="range"] { width: 100%; accent-color: var(--needle); }
+
+footer { border-top: 1px solid var(--line); padding-block: 24px 40px; font-size: .75rem; color: var(--muted); display: flex; flex-direction: column; gap: 6px; }
+footer a { color: var(--muted); }
+
+@media (max-width: 860px) {
+  .hero, .chart-layout, .ai, .perron { grid-template-columns: minmax(0, 1fr); }
+  .hero { padding-block: 32px 16px; }
+  form.birth { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 480px) {
+  form.birth { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .board { gap: 2px; }
+  .cell { padding: 4px; }
+  .cell .minors, .cell .age { display: none; }
+  .meter b { font-size: var(--step-0); }
+  .brand span { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .cursor { animation: none; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><b>掛谷紫微</b><span>zhoujiayu.app</span></div>
+    <nav class="main" aria-label="主選單">
+      <a href="#chart" aria-current="page">排盤</a>
+      <a href="#ai">AI 解讀</a>
+      <a href="#perron">掛谷針</a>
+      <a href="#about">古籍</a>
+    </nav>
+  </header>
+
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero-copy">
+      <span class="eyebrow">Kakeya needle · 1917</span>
+      <h1 id="hero-title">一根針要轉遍所有方向，<em>最少需要多大的地方？</em></h1>
+      <p class="lede">日本數學家掛谷宗一在 1917 年問了這個問題。答案出人意料：面積可以任意小，但這塊地方的「維度」永遠壓不下去。2025 年王虹與 Joshua Zahl 證明了三維的掛谷猜想。命盤也是這樣一塊地方：十二宮是十二個方向，大限像一根針，一生會轉過每一宮。</p>
+      <dl class="readout" aria-live="polite">
+        <dt>針的方向</dt><dd><strong id="hero-dir">子 ⟷ 午</strong></dd>
+        <dt>指向兩宮</dt><dd id="hero-palace">命宮 ⟷ 遷移</dd>
+        <dt>角度</dt><dd class="mono" id="hero-angle">0.0°</dd>
+      </dl>
+    </div>
+    <div class="stage"><canvas id="deltoid" role="img" aria-label="三尖瓣線內旋轉的掛谷針，外圈標示十二地支"></canvas></div>
+  </section>
+
+  <section class="block" id="chart" aria-labelledby="chart-title">
+    <div class="block-head">
+      <div>
+        <span class="eyebrow">排盤</span>
+        <h2 id="chart-title">命盤</h2>
+      </div>
+      <span class="sample-tag">範例命盤 · 原型示意</span>
+    </div>
+    <form class="birth" id="birth">
+      <div class="field"><label for="f-date">出生日期（國曆）</label><input id="f-date" type="date" value="1990-06-15"></div>
+      <div class="field"><label for="f-time">出生時間</label><input id="f-time" type="time" value="12:10"></div>
+      <div class="field"><label for="f-gender">性別</label><select id="f-gender"><option>女</option><option>男</option></select></div>
+      <div class="field"><label for="f-place">出生地</label><select id="f-place"><option>臺北市</option><option>新北市</option><option>臺中市</option><option>臺南市</option><option>高雄市</option></select></div>
+      <div class="field"><label for="f-name">稱呼（選填）</label><input id="f-name" type="text" placeholder="例：小周"></div>
+      <button class="btn solid" type="submit">排盤</button>
+    </form>
+    <p class="note" id="form-note">原型使用固定的範例命盤（1990 年 6 月 15 日午時，女）。正式版會在瀏覽器裡用排盤引擎即時起盤。</p>
+
+    <div class="chart-layout">
+      <div class="board" id="board">
+        <canvas id="needles" aria-hidden="true"></canvas>
+        <div class="center" id="center"></div>
+      </div>
+      <aside class="detail" id="detail" aria-live="polite"></aside>
+    </div>
+    <div class="group">
+      <span>大限 · 點選切換，針會轉向該宮</span>
+      <div class="timeline" id="timeline" role="group" aria-label="大限"></div>
+    </div>
+  </section>
+
+  <section class="block" id="ai" aria-labelledby="ai-title">
+    <div class="block-head">
+      <div>
+        <span class="eyebrow">Claude 解讀</span>
+        <h2 id="ai-title">問這張盤</h2>
+      </div>
+      <span class="sample-tag">版面示意 · 非真實解讀</span>
+    </div>
+    <div class="ai">
+      <div class="asks" role="group" aria-label="常見問題">
+        <button class="ask" type="button" aria-pressed="true">命格總覽：我是怎樣的人？</button>
+        <button class="ask" type="button" aria-pressed="false">事業：適合往哪個方向走？</button>
+        <button class="ask" type="button" aria-pressed="false">這個大限（36–45 歲）要注意什麼？</button>
+        <button class="ask" type="button" aria-pressed="false">感情與婚姻</button>
+      </div>
+      <article class="answer">
+        <div class="meta"><span>依據：命宮 武曲·天府</span><span>格局：府相朝垣</span><span>串流中</span></div>
+        <h4>命格總覽</h4>
+        <p>命宮在子，武曲化權與天府同坐，三方會到紫微、天相，構成府相朝垣。這一段會依倪師「命宮為本、三方為用」的看法，先講性格底色，再講三方帶來的助力……<span class="cursor" aria-hidden="true"></span></p>
+        <p class="note">正式版的文字由 Claude 依這張盤即時產生，逐字串流顯示；引用倪師或《全書》只用查得到的原話。</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="perron" aria-labelledby="perron-title">
+    <div class="perron">
+      <div class="perron-copy">
+        <span class="eyebrow">Besicovitch · Perron tree</span>
+        <h2 id="perron-title">把同樣多的方向，擠進更小的面積</h2>
+        <p>左邊是一個三角形切成 128 根細針，每根針的方向都不一樣。把它們沿底邊互相平移、交疊，方向一個都沒少，佔的面積卻變小。Besicovitch 用這個辦法證明了：讓針轉一圈的區域，面積可以小到任意程度。</p>
+        <p>拖動滑桿看面積怎麼變。擠過頭，針尖反而會散開，面積又變大。</p>
+        <label class="note" for="squeeze">交疊程度</label>
+        <input id="squeeze" type="range" min="0" max="100" value="0">
+        <div class="meter">
+          <div><span>針的數量</span><b>128</b></div>
+          <div><span>涵蓋方向</span><b id="spread">—</b></div>
+          <div><span>面積（原本 = 100）</span><b id="area">100.0</b></div>
+        </div>
+      </div>
+      <div class="stage2"><canvas id="tree" role="img" aria-label="Perron 樹：128 根細三角形針交疊後的形狀"></canvas></div>
+    </div>
+  </section>
+
+  <footer id="about">
+    <span>排盤引擎改自開源專案 ziwei-doushu（MIT，作者 王多魚AI，github.com/Renhuai123/ziwei-doushu），內核基於 iztro 與 lunar-javascript。</span>
+    <span>倪海厦《天紀》原話依 CC BY-NC-SA 4.0 標註出處，僅供非商業學習研究。命理內容僅供參考。</span>
+  </footer>
+</div>
+
+<script>
+const CHART = {"lunar":{"lunarYear":1990,"lunarMonth":5,"lunarDay":23,"yearStem":6,"yearBranch":6,"isLeapMonth":false,"fourPillars":["庚午","壬午","辛亥","甲午"],"fourPillarsLunar":["庚午","壬午","辛亥","甲午"]},"ju":"火六局","mingZhu":"貪狼","shenZhu":"火星","yy":"陽女","ming":0,"shen":0,"age":37,"curDx":3,"palaces":[{"b":2,"s":4,"n":"福德","dx":[106,115],"stars":[{"n":"貪狼","t":"major","br":"平","h":""},{"n":"天廚","t":"minor","br":"","h":""},{"n":"蜚廉","t":"sha","br":"","h":""}],"borrow":null},{"b":3,"s":5,"n":"田宅","dx":[96,105],"stars":[{"n":"天機","t":"major","br":"旺","h":""},{"n":"巨門","t":"major","br":"廟","h":""},{"n":"天喜","t":"lucky","br":"旺","h":""},{"n":"咸池","t":"minor","br":"平","h":""},{"n":"天德","t":"lucky","br":"平","h":""}],"borrow":null},{"b":4,"s":6,"n":"官祿","dx":[86,95],"stars":[{"n":"紫微","t":"major","br":"得","h":""},{"n":"天相","t":"major","br":"得","h":""},{"n":"文昌","t":"lucky","br":"得","h":""},{"n":"鳳閣","t":"lucky","br":"陷","h":""},{"n":"寡宿","t":"sha","br":"陷","h":""},{"n":"年解","t":"lucky","br":"廟","h":""}],"borrow":null},{"b":5,"s":7,"n":"僕役","dx":[76,85],"stars":[{"n":"天梁","t":"major","br":"得","h":""},{"n":"地空","t":"sha","br":"廟","h":""},{"n":"地劫","t":"sha","br":"不","h":""},{"n":"天姚","t":"minor","br":"平","h":""},{"n":"天巫","t":"lucky","br":"","h":""},{"n":"破碎","t":"minor","br":"陷","h":""},{"n":"天傷","t":"sha","br":"平","h":""}],"borrow":null},{"b":6,"s":8,"n":"遷移","dx":[66,75],"stars":[{"n":"七殺","t":"major","br":"旺","h":""},{"n":"右弼","t":"lucky","br":"旺","h":""},{"n":"三臺","t":"lucky","br":"旺","h":""},{"n":"天才","t":"lucky","br":"旺","h":""},{"n":"天壽","t":"lucky","br":"平","h":""},{"n":"天福","t":"lucky","br":"平","h":""},{"n":"截空","t":"sha","br":"廟","h":""},{"n":"陰煞","t":"sha","br":"","h":""}],"borrow":null},{"b":7,"s":9,"n":"疾厄","dx":[56,65],"stars":[{"n":"天鉞","t":"lucky","br":"旺","h":""},{"n":"火星","t":"sha","br":"利","h":""},{"n":"陀羅","t":"sha","br":"廟","h":""},{"n":"天貴","t":"lucky","br":"旺","h":""},{"n":"天月","t":"sha","br":"","h":""},{"n":"天空","t":"sha","br":"陷","h":""},{"n":"副截","t":"sha","br":"廟","h":""},{"n":"天使","t":"sha","br":"平","h":""}],"borrow":["太陽","太陰"]},{"b":8,"s":0,"n":"財帛","dx":[46,55],"stars":[{"n":"廉貞","t":"major","br":"廟","h":""},{"n":"左輔","t":"lucky","br":"平","h":""},{"n":"祿存","t":"lucky","br":"廟","h":""},{"n":"天馬","t":"lucky","br":"旺","h":""},{"n":"八座","t":"lucky","br":"廟","h":""},{"n":"封誥","t":"lucky","br":"","h":""},{"n":"孤辰","t":"sha","br":"平","h":""}],"borrow":null},{"b":9,"s":1,"n":"子女","dx":[36,45],"stars":[{"n":"鈴星","t":"sha","br":"得","h":""},{"n":"擎羊","t":"sha","br":"陷","h":""},{"n":"紅鸞","t":"lucky","br":"旺","h":""}],"borrow":["天機","巨門"]},{"b":10,"s":2,"n":"夫妻","dx":[26,35],"stars":[{"n":"破軍","t":"major","br":"旺","h":""},{"n":"文曲","t":"lucky","br":"陷","h":""},{"n":"龍池","t":"lucky","br":"陷","h":""},{"n":"華蓋","t":"lucky","br":"平","h":""},{"n":"旬空","t":"sha","br":"陷","h":""}],"borrow":null},{"b":11,"s":3,"n":"兄弟","dx":[16,25],"stars":[{"n":"天同","t":"major","br":"廟","h":"忌"},{"n":"天官","t":"lucky","br":"旺","h":""},{"n":"月德","t":"lucky","br":"","h":""},{"n":"劫煞","t":"minor","br":"","h":""},{"n":"副旬","t":"sha","br":"平","h":""}],"borrow":null},{"b":0,"s":4,"n":"命宮","dx":[6,15],"stars":[{"n":"武曲","t":"major","br":"旺","h":"權"},{"n":"天府","t":"major","br":"廟","h":""},{"n":"解神","t":"lucky","br":"廟","h":""},{"n":"臺輔","t":"lucky","br":"","h":""},{"n":"天哭","t":"sha","br":"平","h":""},{"n":"天虛","t":"sha","br":"陷","h":""}],"borrow":null},{"b":1,"s":5,"n":"父母","dx":[116,125],"stars":[{"n":"太陽","t":"major","br":"不","h":"祿"},{"n":"太陰","t":"major","br":"廟","h":"科"},{"n":"天魁","t":"lucky","br":"旺","h":""},{"n":"恩光","t":"lucky","br":"廟","h":""},{"n":"天刑","t":"sha","br":"陷","h":""},{"n":"龍德","t":"minor","br":"","h":""},{"n":"大耗","t":"sha","br":"平","h":""}],"borrow":null}],"daXians":[{"a":6,"z":15,"b":0,"n":"命宮"},{"a":16,"z":25,"b":11,"n":"兄弟"},{"a":26,"z":35,"b":10,"n":"夫妻"},{"a":36,"z":45,"b":9,"n":"子女"},{"a":46,"z":55,"b":8,"n":"財帛"},{"a":56,"z":65,"b":7,"n":"疾厄"},{"a":66,"z":75,"b":6,"n":"遷移"},{"a":76,"z":85,"b":5,"n":"僕役"},{"a":86,"z":95,"b":4,"n":"官祿"},{"a":96,"z":105,"b":3,"n":"田宅"},{"a":106,"z":115,"b":2,"n":"福德"},{"a":116,"z":125,"b":1,"n":"父母"}],"patterns":[{"name":"府相朝垣","level":"excellent"},{"name":"日月同宮","level":"good"},{"name":"輔弼同會","level":"good"}]};
+
+const BRANCH = '子丑寅卯辰巳午未申酉戌亥';
+const STEM = '甲乙丙丁戊己庚辛壬癸';
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const byBranch = {};
+CHART.palaces.forEach(p => { byBranch[p.b] = p; });
+const pname = b => { const n = byBranch[b].n; return n.endsWith('宮') ? n : n + '宮'; };
+
+function css(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+function fitCanvas(cv) {
+  const r = cv.getBoundingClientRect(), dpr = Math.min(devicePixelRatio || 1, 2);
+  const w = Math.max(1, Math.round(r.width * dpr)), h = Math.max(1, Math.round(r.height * dpr));
+  if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
+  const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return { ctx, w: r.width, h: r.height };
+}
+// 地支方位：子在下、午在上、卯在左、酉在右（與方盤一致），數學座標 y 朝上
+const branchAngle = b => (270 - 30 * b) * Math.PI / 180;
+
+/* ───────── 首屏：三尖瓣線（deltoid）裡的掛谷針 ───────── */
+(() => {
+  const cv = document.getElementById('deltoid');
+  const N = 900;
+  const unit = [];
+  for (let i = 0; i < N; i++) {
+    const t = i / N * 2 * Math.PI;
+    unit.push([2 * Math.cos(t) + Math.cos(2 * t), 2 * Math.sin(t) - Math.sin(2 * t)]);
+  }
+  // 參數 t 的切線方向是 e^{-it/2}；用數值求這條切線和曲線的交點，取最遠兩點就是長度 4 的針
+  function needle(t) {
+    const px = 2 * Math.cos(t) + Math.cos(2 * t), py = 2 * Math.sin(t) - Math.sin(2 * t);
+    const dx = Math.cos(-t / 2), dy = Math.sin(-t / 2);
+    let lo = 0, hi = 0;
+    for (let i = 0; i < N; i++) {
+      const [ax, ay] = unit[i], [bx, by] = unit[(i + 1) % N];
+      const ex = bx - ax, ey = by - ay, den = dx * ey - dy * ex;
+      if (Math.abs(den) < 1e-12) continue;
+      const qx = ax - px, qy = ay - py;
+      const lam = (qx * ey - qy * ex) / den, mu = (qx * dy - qy * dx) / den;
+      if (mu >= 0 && mu <= 1) { if (lam < lo) lo = lam; if (lam > hi) hi = lam; }
+    }
+    return [px + dx * lo, py + dy * lo, px + dx * hi, py + dy * hi];
+  }
+  const trail = [];
+  let t = 0.35, last = performance.now();
+  const dirEl = document.getElementById('hero-dir'), palEl = document.getElementById('hero-palace'), angEl = document.getElementById('hero-angle');
+  let lastPair = -1;
+
+  function frame(now) {
+    const dt = Math.min(64, now - last); last = now;
+    if (!reduceMotion) t += dt * 0.00022;
+    const { ctx, w, h } = fitCanvas(cv);
+    const cx = w / 2, cy = h / 2, R = Math.min(w, h) * 0.47, s = R / 3.6;
+    const gold = css('--needle'), fg = css('--fg'), muted = css('--muted'), line = css('--line');
+    ctx.clearRect(0, 0, w, h);
+
+    // 外圈十二地支
+    ctx.strokeStyle = line; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(cx, cy, R * 0.93, 0, Math.PI * 2); ctx.stroke();
+    const seg = needle(t);
+    const ang = Math.atan2(seg[3] - seg[1], seg[2] - seg[0]);
+    // 針（無向）指向的地支對：取最接近的那一對
+    let deg = ((ang * 180 / Math.PI) % 180 + 180) % 180;
+    let best = 0, bestD = 1e9;
+    for (let b = 0; b < 6; b++) {
+      const a = ((270 - 30 * b) % 180 + 180) % 180;
+      const d = Math.min(Math.abs(a - deg), 180 - Math.abs(a - deg));
+      if (d < bestD) { bestD = d; best = b; }
+    }
+    ctx.font = `${Math.max(11, R * 0.075)}px ${css('--font-display')}`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    for (let b = 0; b < 12; b++) {
+      const a = branchAngle(b), on = b === best || b === best + 6;
+      const x = cx + Math.cos(a) * R * 0.93, y = cy - Math.sin(a) * R * 0.93;
+      ctx.fillStyle = css('--ink'); ctx.beginPath(); ctx.arc(x, y, R * 0.07, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = on ? gold : line; ctx.stroke();
+      ctx.fillStyle = on ? gold : muted; ctx.fillText(BRANCH[b], x, y + 1);
+    }
+
+    // 三尖瓣線
+    ctx.beginPath();
+    unit.forEach(([x, y], i) => { const X = cx + x * s, Y = cy - y * s; i ? ctx.lineTo(X, Y) : ctx.moveTo(X, Y); });
+    ctx.closePath(); ctx.strokeStyle = muted; ctx.globalAlpha = .45; ctx.stroke(); ctx.globalAlpha = 1;
+
+    // 掃過的軌跡
+    trail.push(seg); if (trail.length > 140) trail.shift();
+    for (let i = 0; i < trail.length; i++) {
+      const [x1, y1, x2, y2] = trail[i];
+      ctx.globalAlpha = (i / trail.length) * 0.22;
+      ctx.strokeStyle = gold; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(cx + x1 * s, cy - y1 * s); ctx.lineTo(cx + x2 * s, cy - y2 * s); ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+    // 針本體
+    const [x1, y1, x2, y2] = seg;
+    ctx.shadowColor = gold; ctx.shadowBlur = 12;
+    ctx.strokeStyle = gold; ctx.lineWidth = 2.2; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(cx + x1 * s, cy - y1 * s); ctx.lineTo(cx + x2 * s, cy - y2 * s); ctx.stroke();
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = fg;
+    [[x1, y1], [x2, y2]].forEach(([x, y]) => { ctx.beginPath(); ctx.arc(cx + x * s, cy - y * s, 3, 0, Math.PI * 2); ctx.fill(); });
+
+    if (best !== lastPair) {
+      lastPair = best;
+      dirEl.textContent = `${BRANCH[best]} ⟷ ${BRANCH[best + 6]}`;
+      palEl.textContent = `${pname(best)} ⟷ ${pname(best + 6)}`;
+    }
+    angEl.textContent = deg.toFixed(1) + '°';
+    if (!reduceMotion) requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+  if (reduceMotion) addEventListener('resize', () => requestAnimationFrame(frame));
+})();
+
+/* ───────── 命盤 ───────── */
+const board = document.getElementById('board');
+const center = document.getElementById('center');
+const detail = document.getElementById('detail');
+const timeline = document.getElementById('timeline');
+// 方盤位置：巳午未申 / 辰  酉 / 卯  戌 / 寅丑子亥
+const POS = { 5: [1, 1], 6: [1, 2], 7: [1, 3], 8: [1, 4], 4: [2, 1], 9: [2, 4], 3: [3, 1], 10: [3, 4], 2: [4, 1], 1: [4, 2], 0: [4, 3], 11: [4, 4] };
+const trineOf = b => [b, (b + 6) % 12, (b + 4) % 12, (b + 8) % 12];
+let selected = CHART.ming;
+let dxIndex = CHART.curDx;
+const cells = {};
+
+const huaTag = h => h ? `<span class="hua ${h}">${h}</span>` : '';
+for (let b = 0; b < 12; b++) {
+  const p = byBranch[b];
+  const el = document.createElement('button');
+  el.type = 'button'; el.className = 'cell';
+  el.style.gridRow = POS[b][0]; el.style.gridColumn = POS[b][1];
+  const majors = p.stars.filter(s => s.t === 'major');
+  const others = p.stars.filter(s => s.t !== 'major').map(s => s.n + (s.h ? `<span class="hua ${s.h}">${s.h}</span>` : '')).join(' ');
+  el.innerHTML = `
+    <div class="majors">${majors.length ? majors.map(s => `<span>${s.n}<span class="br">${s.br}</span>${huaTag(s.h)}</span>`).join('') : `<span class="borrow">空宮${p.borrow ? '・借' + p.borrow.join('') : ''}</span>`}</div>
+    <div class="minors">${others}</div>
+    <div class="foot"><span class="pname${b === CHART.ming ? ' ming' : ''}">${pname(b)}${b === CHART.shen ? '・身' : ''}</span><span><span class="age">${p.dx ? p.dx[0] + '–' + p.dx[1] : ''}</span> <span class="gz">${STEM[p.s]}${BRANCH[b]}</span></span></div>`;
+  el.setAttribute('aria-label', `${pname(b)}，${majors.map(s => s.n).join('、') || '空宮'}`);
+  el.addEventListener('click', () => select(b));
+  board.appendChild(el);
+  cells[b] = el;
+}
+const L = CHART.lunar;
+center.innerHTML = `
+  <div class="who">範例命盤</div>
+  <div class="facts">${CHART.yy}・${CHART.ju}<br>農曆 ${L.lunarYear} 年 ${L.lunarMonth} 月 ${L.lunarDay} 日 午時<br>四柱 ${L.fourPillars.join(' ')}<br>命主 ${CHART.mingZhu}・身主 ${CHART.shenZhu}</div>
+  <div class="dir" id="center-dir"></div>`;
+
+CHART.daXians.forEach((d, i) => {
+  const el = document.createElement('button');
+  el.type = 'button'; el.className = 'dx' + (i === CHART.curDx ? ' now' : '');
+  el.innerHTML = `<span class="mono">${d.a}–${d.z}</span> ${d.n.endsWith('宮') ? d.n : d.n + '宮'}`;
+  el.addEventListener('click', () => { dxIndex = i; select(d.b); });
+  timeline.appendChild(el);
+});
+
+function select(b) {
+  selected = b;
+  const tri = trineOf(b);
+  for (let k = 0; k < 12; k++) {
+    cells[k].setAttribute('aria-pressed', String(k === b));
+    cells[k].classList.toggle('trine', k !== b && tri.includes(k));
+    cells[k].querySelector('.dx-now')?.remove();
+  }
+  const dxB = CHART.daXians[dxIndex].b;
+  const dot = document.createElement('span'); dot.className = 'dx-now'; cells[dxB].appendChild(dot);
+  [...timeline.children].forEach((el, i) => el.setAttribute('aria-pressed', String(i === dxIndex)));
+  renderDetail(b);
+  targetAngle = branchAngle(b);
+  document.getElementById('center-dir').textContent = `針 → ${pname(b)} ⟷ ${pname((b + 6) % 12)}`;
+  kick();
+}
+
+function renderDetail(b) {
+  const p = byBranch[b];
+  const grp = (title, list, cls) => list.length ? `<div class="group"><span>${title}</span><div class="chips">${list.map(s => `<span class="chip ${cls}">${s.n}${s.br ? `<small>${s.br}</small>` : ''}${huaTag(s.h)}</span>`).join('')}</div></div>` : '';
+  const tri = trineOf(b);
+  const role = ['本宮', '對宮', '三合', '三合'];
+  detail.innerHTML = `
+    <h3>${pname(b)}<span class="mono">${STEM[p.s]}${BRANCH[b]}${p.dx ? ` · 大限 ${p.dx[0]}–${p.dx[1]} 歲` : ''}</span></h3>
+    ${grp('主星', p.stars.filter(s => s.t === 'major'), 'major') || `<div class="group"><span>主星</span><p class="note">空宮，借對宮 ${p.borrow ? p.borrow.join('、') : ''} 來看。</p></div>`}
+    ${grp('吉星', p.stars.filter(s => s.t === 'lucky'), '')}
+    ${grp('煞星', p.stars.filter(s => s.t === 'sha'), 'sha')}
+    ${grp('雜曜', p.stars.filter(s => s.t === 'minor'), '')}
+    <div class="group"><span>三方四正</span><div class="sfsz">${tri.map((k, i) => {
+      const m = byBranch[k].stars.filter(s => s.t === 'major').map(s => s.n + (s.h ? '化' + s.h : '')).join('、') || '空宮';
+      return `<div><b>${pname(k)}</b><span>${role[i]} · ${m}</span></div>`;
+    }).join('')}</div></div>
+    ${b === CHART.ming ? `<div class="group"><span>格局（引擎判定）</span><div class="patterns">${CHART.patterns.map(x => `<span class="pat ${x.level === 'excellent' ? '' : 'good'}">${x.name}</span>`).join('')}</div></div>` : ''}`;
+}
+
+/* 盤面上的針：本宮與對宮連成一根長針，兩個三合宮是細針；選宮時長針轉過去 */
+const ncv = document.getElementById('needles');
+let curAngle = branchAngle(CHART.ming), targetAngle = curAngle, running = false, phase = 0;
+function cellCenter(b, w, h) {
+  const [r, c] = POS[b];
+  return [(c - 0.5) / 4 * w, (r - 0.5) / 4 * h];
+}
+function drawNeedles() {
+  const { ctx, w, h } = fitCanvas(ncv);
+  const gold = css('--needle'), line = css('--line');
+  ctx.clearRect(0, 0, w, h);
+  const cx = w / 2, cy = h / 2, R = Math.hypot(w, h) * 0.37;
+  // 十二個方向的底線
+  ctx.strokeStyle = line; ctx.lineWidth = 1;
+  for (let b = 0; b < 12; b++) {
+    const [x, y] = cellCenter(b, w, h);
+    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(x, y); ctx.stroke();
+  }
+  // 三合細針
+  const tri = trineOf(selected);
+  ctx.strokeStyle = gold; ctx.globalAlpha = .55; ctx.lineWidth = 1;
+  ctx.setLineDash([3, 4]);
+  ctx.beginPath();
+  [tri[0], tri[2], tri[3]].forEach((b, i) => { const [x, y] = cellCenter(b, w, h); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
+  ctx.closePath(); ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1;
+  // 旋轉中的長針（無向，貫穿本宮與對宮）
+  let d = targetAngle - curAngle;
+  d = Math.atan2(Math.sin(d), Math.cos(d));
+  if (Math.abs(d) > Math.PI / 2) d += d > 0 ? -Math.PI : Math.PI; // 針沒有頭尾，轉最短的那一邊
+  curAngle += reduceMotion ? d : d * 0.08;
+  const ux = Math.cos(curAngle), uy = -Math.sin(curAngle);
+  // 掃過的扇形殘影
+  ctx.fillStyle = css('--needle-soft');
+  ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, R, -curAngle - 0.04, -curAngle + 0.04); ctx.closePath(); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, R, Math.PI - curAngle - 0.04, Math.PI - curAngle + 0.04); ctx.closePath(); ctx.fill();
+  ctx.shadowColor = gold; ctx.shadowBlur = 10; ctx.strokeStyle = gold; ctx.lineWidth = 2; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(cx - ux * R, cy - uy * R); ctx.lineTo(cx + ux * R, cy + uy * R); ctx.stroke();
+  ctx.shadowBlur = 0;
+  // 針上流動的光點
+  phase = (phase + (reduceMotion ? 0 : 0.006)) % 1;
+  const f = phase * 2 - 1;
+  ctx.fillStyle = gold; ctx.beginPath(); ctx.arc(cx + ux * R * f, cy + uy * R * f, 2.5, 0, Math.PI * 2); ctx.fill();
+  return Math.abs(d) > 0.001;
+}
+function loop() { const moving = drawNeedles(); if (moving || !reduceMotion) requestAnimationFrame(loop); else running = false; }
+function kick() { if (!running) { running = true; requestAnimationFrame(loop); } }
+addEventListener('resize', kick);
+select(CHART.ming);
+
+/* ───────── Perron 樹 ───────── */
+(() => {
+  const cv = document.getElementById('tree'), slider = document.getElementById('squeeze'), areaEl = document.getElementById('area');
+  const LEVELS = 7, NT = 1 << LEVELS;
+  const off = document.createElement('canvas'); off.width = 240; off.height = 180;
+  const octx = off.getContext('2d', { willReadFrequently: true });
+  let base = null;
+  // 每根細針的水平位移：第 k 層二進位位為 1 的針往左移，越深的層移得越多，交疊後長出「樹枝」
+  function shifts(alpha) {
+    const s = [];
+    for (let i = 0; i < NT; i++) {
+      let v = 0;
+      for (let k = 1; k <= LEVELS; k++) if ((i >> (LEVELS - k)) & 1) v -= (1 - alpha) * Math.pow(2, -k) * (k / LEVELS);
+      s.push(v);
+    }
+    return s;
+  }
+  // 回傳每根針的三角形（底左、底右、針尖），整體水平置中、寬度依原三角形縮放
+  function tris(alpha, W, H, pad) {
+    const sh = shifts(alpha), raw = [];
+    let lo = Infinity, hi = -Infinity;
+    for (let i = 0; i < NT; i++) {
+      const b0 = i / NT + sh[i], b1 = b0 + 1 / NT, a = 0.5 + sh[i];
+      raw.push([b0, b1, a]);
+      lo = Math.min(lo, b0, a); hi = Math.max(hi, b1, a);
+    }
+    const scale = (W - pad * 2) * 0.7, mid = (lo + hi) / 2;
+    const X = u => W / 2 + (u - mid) * scale;
+    return raw.map(([b0, b1, a]) => [X(b0), H - pad, X(b1), H - pad, X(a), pad]);
+  }
+  function spread(W, H, pad) {
+    const half = (W - pad * 2) * 0.7 / 2;
+    return 2 * Math.atan(half / (H - pad * 2)) * 180 / Math.PI;
+  }
+  function measure(alpha) {
+    octx.clearRect(0, 0, off.width, off.height); octx.fillStyle = '#000';
+    tris(alpha, off.width, off.height, 10).forEach(([a, b, c, d, e, f]) => { octx.beginPath(); octx.moveTo(a, b); octx.lineTo(c, d); octx.lineTo(e, f); octx.closePath(); octx.fill(); });
+    const px = octx.getImageData(0, 0, off.width, off.height).data;
+    let n = 0; for (let i = 3; i < px.length; i += 4) if (px[i] > 127) n++;
+    return n;
+  }
+  function draw() {
+    const alpha = 1 - slider.value / 100;
+    const { ctx, w, h } = fitCanvas(cv);
+    ctx.clearRect(0, 0, w, h);
+    const gold = css('--needle');
+    ctx.fillStyle = gold; ctx.globalAlpha = 0.16; ctx.strokeStyle = gold; ctx.lineWidth = 0.5;
+    tris(alpha, w, h, 20).forEach(([a, b, c, d, e, f]) => {
+      ctx.beginPath(); ctx.moveTo(a, b); ctx.lineTo(c, d); ctx.lineTo(e, f); ctx.closePath(); ctx.fill();
+    });
+    ctx.globalAlpha = 0.55;
+    tris(alpha, w, h, 20).forEach(([a, b, c, d, e, f]) => { ctx.beginPath(); ctx.moveTo((a + c) / 2, b); ctx.lineTo(e, f); ctx.stroke(); });
+    ctx.globalAlpha = 1;
+    document.getElementById('spread').textContent = spread(w, h, 20).toFixed(1) + '°';
+    if (base === null) base = measure(1);
+    areaEl.textContent = (measure(alpha) / base * 100).toFixed(1);
+  }
+  slider.addEventListener('input', draw);
+  addEventListener('resize', draw);
+  draw();
+  // 進場時自動擠一次，示範面積變小
+  if (!reduceMotion) {
+    let v = 0;
+    const go = () => { v += 0.6; slider.value = String(Math.min(v, 55)); draw(); if (v < 55) requestAnimationFrame(go); };
+    setTimeout(() => requestAnimationFrame(go), 900);
+  }
+})();
+
+/* 原型：問題按鈕只切換選取狀態；表單不送出 */
+document.querySelectorAll('.ask').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.ask').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+}));
+document.getElementById('birth').addEventListener('submit', e => {
+  e.preventDefault();
+  document.getElementById('form-note').textContent = '原型只展示範例命盤；正式版按下「排盤」會用你填的資料即時起盤。';
+});
+</script>
+
+</html>
